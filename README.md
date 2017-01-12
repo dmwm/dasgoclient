@@ -8,7 +8,7 @@ Go implementation of DAS (Data Aggregation System) client for CMS data-services
 
 ### Installation & Usage
 
-To compile the server you need a Go compiler, then perform the following:
+To compile the client you need a Go compiler, then perform the following:
 
 ```
 # one time operation, setup your GOPATH and download the following
@@ -21,7 +21,7 @@ go get github.com/buger/jsonparser
 make
 ```
 
-It will build ```dasgoclient``` executable which you can use as following:
+The build will produce ```dasgoclient``` static executable which you can use as following:
 ```
 ./dasgoclient -help
 Usage of ./dasgoclient:
