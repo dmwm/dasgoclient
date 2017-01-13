@@ -36,6 +36,30 @@ func main() {
 	process(query, jsonout)
 }
 
+// helper function to make a choice which CMS data-service will be used for DAS query
+// in other words it let us skip unnecessary system
+func skipSystem(dasquery dasql.DASQuery, system string) bool {
+	keyMap := map[string]string{
+		"site":    "phedex",
+		"dataset": "dbs3",
+		"block":   "dbs3",
+		"file":    "dbs3",
+		"run":     "runregistry",
+	}
+	if dasquery.System == "" {
+		for _, key := range dasquery.Fields {
+			if keyMap[key] != "" && system != "" && keyMap[key] != system {
+				return true
+			}
+		}
+	} else {
+		if dasquery.System != system {
+			return true
+		}
+	}
+	return false
+}
+
 // Process function process' given query and return back results
 func process(query string, jsonout bool) {
 	var dmaps dasmaps.DASMaps
@@ -55,7 +79,7 @@ func process(query string, jsonout bool) {
 	for _, dmap := range maps {
 		args := ""
 		system, _ := dmap["system"].(string)
-		if dasquery.System != "" && dasquery.System != system {
+		if skipSystem(dasquery, system) {
 			continue
 		}
 		if system == "runregistry" {
