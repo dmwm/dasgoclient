@@ -39,6 +39,9 @@ func main() {
 // helper function to make a choice which CMS data-service will be used for DAS query
 // in other words it let us skip unnecessary system
 func skipSystem(dasquery dasql.DASQuery, system string) bool {
+	if len(dasquery.Fields) > 1 { // multiple keys
+		return false
+	}
 	keyMap := map[string]string{
 		"site":    "phedex",
 		"dataset": "dbs3",
