@@ -82,7 +82,7 @@ func process(query string, jsonout bool) {
 	for _, dmap := range maps {
 		args := ""
 		system, _ := dmap["system"].(string)
-		if skipSystem(dasquery, system) {
+		if skipSystem(dasquery, system) && len(maps) > 1 {
 			continue
 		}
 		if system == "runregistry" {
