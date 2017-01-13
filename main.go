@@ -24,27 +24,23 @@ import (
 func main() {
 	var query string
 	flag.StringVar(&query, "query", "", "DAS query to run")
-	var inst string
-	flag.StringVar(&inst, "inst", "prod/global", "DBS instance to use")
 	var jsonout bool
 	flag.BoolVar(&jsonout, "json", false, "Return results from DAS CLI in json form")
 	var verbose int
+	flag.IntVar(&verbose, "verbose", 0, "Verbose level, support 0,1,2")
 	flag.Parse()
 	utils.VERBOSE = verbose
 	utils.UrlQueueLimit = 1000
 	utils.UrlRetry = 3
 	utils.WEBSERVER = 0
-	process(query, inst, jsonout)
+	process(query, jsonout)
 }
 
 // Process function process' given query and return back results
-func process(query, inst string, jsonout bool) {
+func process(query string, jsonout bool) {
 	var dmaps dasmaps.DASMaps
 	dmaps.LoadMapsFromFile()
-	if inst == "" {
-		inst = "prod/global"
-	}
-	dasquery, err := dasql.Parse(query, inst, dmaps.DASKeys())
+	dasquery, err := dasql.Parse(query, "", dmaps.DASKeys())
 	if utils.VERBOSE > 0 {
 		fmt.Println(dasquery, err)
 	}
@@ -59,6 +55,9 @@ func process(query, inst string, jsonout bool) {
 	for _, dmap := range maps {
 		args := ""
 		system, _ := dmap["system"].(string)
+		if dasquery.System != "" && dasquery.System != system {
+			continue
+		}
 		if system == "runregistry" {
 			switch v := dasquery.Spec["run"].(type) {
 			case string:
@@ -125,8 +124,6 @@ func process(query, inst string, jsonout bool) {
 // helper function to print DAS records on stdout
 func printRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, jsonout bool) {
 	for _, rec := range dasrecords {
-		delete(rec, "das")
-		delete(rec, "qhash")
 		if jsonout {
 			out, err := json.Marshal(rec)
 			if err == nil {
@@ -147,8 +144,10 @@ func printRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, jsonout b
 			for _, keys := range selectKeys {
 				val, _, _, err := jsonparser.Get(rbytes, keys...)
 				if err == nil {
-					out = append(out, string(val))
-					//                     fmt.Println(string(val))
+					sval := string(val)
+					if !utils.InList(sval, out) {
+						out = append(out, sval)
+					}
 				} else {
 					if utils.VERBOSE > 0 {
 						fmt.Println("Fail to parse DAS record", keys, err, rec)
