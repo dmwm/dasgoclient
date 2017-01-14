@@ -183,9 +183,7 @@ func printFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord,
 					if err != nil {
 						fmt.Errorf("Unable to extract filters=%v, error=%v\n", filters, err)
 					} else {
-						for _, rec := range val {
-							out = append(out, string(rec))
-						}
+						out = append(out, string(val))
 					}
 				}
 				out = append(out, sep)
