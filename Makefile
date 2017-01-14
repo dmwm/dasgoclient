@@ -5,7 +5,7 @@ flags=-ldflags="-s -w"
 all: build
 
 build:
-	go clean; rm -rf pkg; go build ${flags}
+	go clean; rm -rf pkg dasgoclient*; go build ${flags}
 
 build_all: build_osx build_linux build
 
