@@ -50,6 +50,7 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 		"block":   "dbs3",
 		"file":    "dbs3",
 		"run":     "runregistry",
+		"config":  "reqmgr2",
 	}
 	if dasquery.System == "" {
 		for _, key := range dasquery.Fields {
