@@ -147,7 +147,11 @@ func process(query string, jsonout bool, sep string) {
 	} else if len(localApis) > 0 {
 		dasrecords = processLocalApis(dasquery, localApis, pkeys)
 	}
-	if dasquery.Filters != nil {
+	if utils.VERBOSE > 0 {
+		fmt.Println("Received", len(dasrecords), "records")
+		fmt.Println("Select keys", selectKeys)
+	}
+	if len(dasquery.Filters) > 0 {
 		printFilteredRecords(dasquery, dasrecords, sep)
 	} else {
 		printRecords(dasrecords, selectKeys, jsonout, sep)
