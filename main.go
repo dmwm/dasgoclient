@@ -56,7 +56,7 @@ func main() {
 
 // helper function to show examples of DAS queries
 func showExamples() {
-	examples := []string{"block_queries.txt", "file_queries.txt", "lumi_queries.txt", "reqmgr_queries.txt", "comp_queries.txt", "ib_queries.txt", "mcm_queries.txt", "run_queries.txt", "dataset_queries.txt", "jobsummary_queries.txt", "misc_queries.txt", "site_queries.txt", "parent_queries.txt", "summary_queries.txt"}
+	examples := []string{"block_queries.txt", "file_queries.txt", "lumi_queries.txt", "mcm_queries.txt", "run_queries.txt", "dataset_queries.txt", "jobsummary_queries.txt", "misc_queries.txt", "site_queries.txt"}
 	for _, fname := range examples {
 		arr := strings.Split(fname, "_")
 		msg := fmt.Sprintf("### %s queries:\n", arr[0])
