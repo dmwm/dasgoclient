@@ -25,17 +25,44 @@ func main() {
 	var query string
 	flag.StringVar(&query, "query", "", "DAS query to run")
 	var jsonout bool
-	flag.BoolVar(&jsonout, "json", false, "Return results from DAS CLI in json form")
+	flag.BoolVar(&jsonout, "json", false, "Return results in JSON data-format")
 	var sep string
 	flag.StringVar(&sep, "sep", " ", "Separator to use, default empty space")
 	var verbose int
 	flag.IntVar(&verbose, "verbose", 0, "Verbose level, support 0,1,2")
+	var examples bool
+	flag.BoolVar(&examples, "examples", false, "Show examples of supported DAS queries")
+	flag.Usage = func() {
+		fmt.Println("DAS command line client")
+		fmt.Println("Usage: dasgoclient [options]")
+		flag.PrintDefaults()
+		fmt.Println("Examples:")
+		fmt.Println("\t# get results")
+		fmt.Println("\tdasgoclient -query=\"dataset=/ZMM*/*/*\"")
+		fmt.Println("\t# get results in JSON data-format")
+		fmt.Println("\tdasgoclient -query=\"dataset=/ZMM*/*/*\" -json")
+	}
 	flag.Parse()
 	utils.VERBOSE = verbose
 	utils.UrlQueueLimit = 1000
 	utils.UrlRetry = 3
 	utils.WEBSERVER = 0
-	process(query, jsonout, sep)
+	if examples {
+		showExamples()
+	} else {
+		process(query, jsonout, sep)
+	}
+}
+
+// helper function to show examples of DAS queries
+func showExamples() {
+	examples := []string{"block_queries.txt", "file_queries.txt", "lumi_queries.txt", "reqmgr_queries.txt", "comp_queries.txt", "ib_queries.txt", "mcm_queries.txt", "run_queries.txt", "dataset_queries.txt", "jobsummary_queries.txt", "misc_queries.txt", "site_queries.txt", "parent_queries.txt", "summary_queries.txt"}
+	for _, fname := range examples {
+		arr := strings.Split(fname, "_")
+		msg := fmt.Sprintf("### %s queries:\n", arr[0])
+		fmt.Println(strings.ToTitle(msg))
+		fmt.Println(utils.LoadExamples(fname))
+	}
 }
 
 // helper function to make a choice which CMS data-service will be used for DAS query
