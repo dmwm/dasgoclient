@@ -16,7 +16,10 @@ import (
 	"github.com/vkuznet/das2go/mongo"
 	"github.com/vkuznet/das2go/services"
 	"github.com/vkuznet/das2go/utils"
+	"os"
+	"os/user"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 )
@@ -27,13 +30,14 @@ func main() {
 	var jsonout bool
 	flag.BoolVar(&jsonout, "json", false, "Return results in JSON data-format")
 	var sep string
-	flag.StringVar(&sep, "sep", " ", "Separator to use, default empty space")
+	flag.StringVar(&sep, "sep", " ", "Separator to use")
 	var verbose int
 	flag.IntVar(&verbose, "verbose", 0, "Verbose level, support 0,1,2")
 	var examples bool
 	flag.BoolVar(&examples, "examples", false, "Show examples of supported DAS queries")
+	var daskeys bool
+	flag.BoolVar(&daskeys, "daskeys", false, "Show supported DAS keys")
 	flag.Usage = func() {
-		fmt.Println("DAS command line client")
 		fmt.Println("Usage: dasgoclient [options]")
 		flag.PrintDefaults()
 		fmt.Println("Examples:")
@@ -41,16 +45,48 @@ func main() {
 		fmt.Println("\tdasgoclient -query=\"dataset=/ZMM*/*/*\"")
 		fmt.Println("\t# get results in JSON data-format")
 		fmt.Println("\tdasgoclient -query=\"dataset=/ZMM*/*/*\" -json")
+		fmt.Println("\t# get results from specific CMS data-service, e.g. phedex")
+		fmt.Println("\tdasgoclient -query=\"file dataset=/ZMM/Summer11-DESIGN42_V11_428_SLHC1-v1/GEN-SIM system=phedex\" -json")
 	}
 	flag.Parse()
 	utils.VERBOSE = verbose
 	utils.UrlQueueLimit = 1000
 	utils.UrlRetry = 3
 	utils.WEBSERVER = 0
+	checkX509()
 	if examples {
 		showExamples()
+	} else if daskeys {
+		showDASKeys()
 	} else {
 		process(query, jsonout, sep)
+	}
+}
+
+// helper function to check X509 settings
+func checkX509() {
+	uproxy := os.Getenv("X509_USER_PROXY")
+	uckey := os.Getenv("X509_USER_KEY")
+	ucert := os.Getenv("X509_USER_CERT")
+	var check int
+	if uproxy == "" {
+		// check if /tmp/x509up_u$UID exists
+		u, err := user.Current()
+		if err == nil {
+			fname := fmt.Sprintf("/tmp/x509up_u%s", u.Uid)
+			if _, err := os.Stat(fname); err != nil {
+				check += 1
+			}
+		}
+	}
+	if uckey == "" && ucert == "" {
+		check += 1
+	}
+	if check > 1 {
+		fmt.Println("Neither X509_USER_PROXY or X509_USER_KEY/X509_USER_CERT are set")
+		fmt.Println("In order to run please obtain valid proxy via \"voms-proxy-init -voms cms -rfc\"")
+		fmt.Println("and setup X509_USER_PROXY or setup X509_USER_KEY/X509_USER_CERT in your environment")
+		os.Exit(-1)
 	}
 }
 
@@ -65,12 +101,8 @@ func showExamples() {
 	}
 }
 
-// helper function to make a choice which CMS data-service will be used for DAS query
-// in other words it let us skip unnecessary system
-func skipSystem(dasquery dasql.DASQuery, system string) bool {
-	if len(dasquery.Fields) > 1 { // multiple keys
-		return false
-	}
+// global keymap for DAS keys and associate CMS data-service
+func DASKeyMap() map[string]string {
 	keyMap := map[string]string{
 		"site":    "phedex",
 		"dataset": "dbs3",
@@ -79,6 +111,68 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 		"run":     "runregistry",
 		"config":  "reqmgr2",
 	}
+	return keyMap
+}
+
+// helper function to extracvt services from DAS map
+func dasServices(rec mongo.DASRecord) []string {
+	var out []string
+	switch s := rec["services"].(type) {
+	case string:
+		out = append(out, rec["system"].(string))
+	case map[string]interface{}:
+		for k, _ := range s {
+			out = append(out, k)
+		}
+	}
+	return out
+}
+
+// helper function to show supported DAS keys
+func showDASKeys() {
+	var dmaps dasmaps.DASMaps
+	dmaps.LoadMapsFromFile()
+	keys := make(map[string][]string)
+	for _, rec := range dmaps.Maps() {
+		if rec["lookup"] != nil {
+			lookup := rec["lookup"].(string)
+			if lookup == "city" || lookup == "zip" || lookup == "ip" || lookup == "monitor" {
+				continue
+			}
+			if s, ok := keys[lookup]; ok {
+				for _, v := range dasServices(rec) {
+					s = append(s, v)
+				}
+				keys[lookup] = s
+			} else {
+				keys[lookup] = dasServices(rec)
+			}
+		}
+	}
+	keyMap := DASKeyMap()
+	fmt.Println("DAS keys and associated CMS data-service info")
+	fmt.Println("---------------------------------------------")
+	var sKeys []string
+	for k, _ := range keys {
+		sKeys = append(sKeys, k)
+	}
+	sort.Sort(utils.StringList(sKeys))
+	for _, k := range sKeys {
+		msg := fmt.Sprintf("%s comes from %v services", k, utils.List2Set(keys[k]))
+		if val, ok := keyMap[k]; ok {
+			msg = fmt.Sprintf("%s, default is %s system", msg, val)
+		}
+		fmt.Println(msg)
+	}
+}
+
+// helper function to make a choice which CMS data-service will be used for DAS query
+// in other words it let us skip unnecessary system
+func skipSystem(dasquery dasql.DASQuery, system string) bool {
+	if len(dasquery.Fields) > 1 { // multiple keys
+		return false
+	}
+	keyMap := DASKeyMap()
 	if dasquery.System == "" {
 		for _, key := range dasquery.Fields {
 			if keyMap[key] != "" && system != "" && keyMap[key] != system {
