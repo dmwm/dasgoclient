@@ -319,11 +319,18 @@ func printFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord,
 
 // helper function to print DAS records on stdout
 func printRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, jsonout bool, sep string) {
-	for _, rec := range dasrecords {
+	if jsonout {
+		fmt.Println("[")
+	}
+	for idx, rec := range dasrecords {
 		if jsonout {
 			out, err := json.Marshal(rec)
 			if err == nil {
-				fmt.Println(string(out))
+				if idx < len(dasrecords)-1 {
+					fmt.Println(string(out), ",")
+				} else {
+					fmt.Println(string(out))
+				}
 			} else {
 				fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
 			}
@@ -349,6 +356,9 @@ func printRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, jsonout b
 				fmt.Println(strings.Join(out, sep))
 			}
 		}
+	}
+	if jsonout {
+		fmt.Println("]")
 	}
 }
 
