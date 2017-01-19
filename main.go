@@ -265,7 +265,7 @@ func process(query string, jsonout bool, sep string) {
 	}
 	var dasrecords []mongo.DASRecord
 	if len(urls) > 0 {
-		dasrecords = processURLs(dasquery, urls, maps, dmaps, pkeys)
+		dasrecords = processURLs(dasquery, urls, maps, &dmaps, pkeys)
 	} else if len(localApis) > 0 {
 		dasrecords = processLocalApis(dasquery, localApis, pkeys)
 	}
@@ -362,16 +362,65 @@ func printRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, jsonout b
 	}
 }
 
+// helper function to get DAS records out of url response
+func response2Records(r *utils.ResponseType, dasquery dasql.DASQuery, maps []mongo.DASRecord, dmaps *dasmaps.DASMaps, pkeys []string) []mongo.DASRecord {
+	var dasrecords []mongo.DASRecord
+	system := ""
+	expire := 0
+	urn := ""
+	for _, dmap := range maps {
+		surl := dasmaps.GetString(dmap, "url")
+		// TMP fix, until we fix Phedex data to use JSON
+		if strings.Contains(surl, "phedex") {
+			surl = strings.Replace(surl, "xml", "json", -1)
+		}
+		// here we check that request Url match DAS map one either by splitting
+		// base from parameters or making a match for REST based urls
+		stm := dasmaps.GetString(dmap, "system")
+		inst := dasquery.Instance
+		if inst != "prod/global" && stm == "dbs3" {
+			surl = strings.Replace(surl, "prod/global", inst, -1)
+		}
+		if strings.Split(r.Url, "?")[0] == surl || strings.HasPrefix(r.Url, surl) || r.Url == surl {
+			urn = dasmaps.GetString(dmap, "urn")
+			system = dasmaps.GetString(dmap, "system")
+			expire = dasmaps.GetInt(dmap, "expire")
+		}
+	}
+	// process data records
+	notations := dmaps.FindNotations(system)
+	records := services.Unmarshal(system, urn, r.Data, notations)
+	records = services.AdjustRecords(dasquery, system, urn, records, expire, pkeys)
+
+	// add records
+	for _, rec := range records {
+		dasrecords = append(dasrecords, rec)
+	}
+	return dasrecords
+}
+
 // helper function to process given set of URLs associted with dasquery
-func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.DASRecord, dmaps dasmaps.DASMaps, pkeys []string) []mongo.DASRecord {
+func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.DASRecord, dmaps *dasmaps.DASMaps, pkeys []string) []mongo.DASRecord {
 	// defer function will propagate panic message to higher level
 	//     defer utils.ErrPropagate("processUrls")
 
 	var dasrecords []mongo.DASRecord
+	if len(urls) == 1 {
+		for furl, args := range urls {
+			if !dasquery.Detail && strings.Contains(furl, "detail=True") {
+				furl = strings.Replace(furl, "detail=True", "detail=False", -1)
+			}
+			resp := utils.FetchResponse(furl, args)
+			return response2Records(&resp, dasquery, maps, dmaps, pkeys)
+		}
+	}
 	out := make(chan utils.ResponseType)
 	defer close(out)
 	umap := map[string]int{}
 	for furl, args := range urls {
+		if !dasquery.Detail && strings.Contains(furl, "detail=True") {
+			furl = strings.Replace(furl, "detail=True", "detail=False", -1)
+		}
 		umap[furl] = 1 // keep track of processed urls below
 		go utils.Fetch(furl, args, out)
 	}
@@ -381,35 +430,7 @@ func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.D
 	for {
 		select {
 		case r := <-out:
-			system := ""
-			expire := 0
-			urn := ""
-			for _, dmap := range maps {
-				surl := dasmaps.GetString(dmap, "url")
-				// TMP fix, until we fix Phedex data to use JSON
-				if strings.Contains(surl, "phedex") {
-					surl = strings.Replace(surl, "xml", "json", -1)
-				}
-				// here we check that request Url match DAS map one either by splitting
-				// base from parameters or making a match for REST based urls
-				stm := dasmaps.GetString(dmap, "system")
-				inst := dasquery.Instance
-				if inst != "prod/global" && stm == "dbs3" {
-					surl = strings.Replace(surl, "prod/global", inst, -1)
-				}
-				if strings.Split(r.Url, "?")[0] == surl || strings.HasPrefix(r.Url, surl) || r.Url == surl {
-					urn = dasmaps.GetString(dmap, "urn")
-					system = dasmaps.GetString(dmap, "system")
-					expire = dasmaps.GetInt(dmap, "expire")
-				}
-			}
-			// process data records
-			notations := dmaps.FindNotations(system)
-			records := services.Unmarshal(system, urn, r.Data, notations)
-			records = services.AdjustRecords(dasquery, system, urn, records, expire, pkeys)
-
-			// add records
-			for _, rec := range records {
+			for _, rec := range response2Records(&r, dasquery, maps, dmaps, pkeys) {
 				dasrecords = append(dasrecords, rec)
 			}
 			// remove from umap, indicate that we processed it
