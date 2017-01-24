@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/vkuznet/dasgoclient.svg?branch=master)](https://travis-ci.org/vkuznet/dasgoclient)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vkuznet/dasgoclient)](https://goreportcard.com/report/github.com/vkuznet/dasgoclient)
 [![GoDoc](https://godoc.org/github.com/vkuznet/dasgoclient?status.svg)](https://godoc.org/github.com/vkuznet/dasgoclient)
+[![DOI](https://zenodo.org/badge/78777726.svg)](https://zenodo.org/badge/78777726.svg)
 
 Go implementation of DAS (Data Aggregation System) client for CMS data-services
 
