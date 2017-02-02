@@ -9,19 +9,21 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/buger/jsonparser"
-	"github.com/vkuznet/das2go/das"
-	"github.com/vkuznet/das2go/dasmaps"
-	"github.com/vkuznet/das2go/dasql"
-	"github.com/vkuznet/das2go/mongo"
-	"github.com/vkuznet/das2go/services"
-	"github.com/vkuznet/das2go/utils"
 	"os"
 	"os/user"
 	"reflect"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/buger/jsonparser"
+	"github.com/pkg/profile"
+	"github.com/vkuznet/das2go/das"
+	"github.com/vkuznet/das2go/dasmaps"
+	"github.com/vkuznet/das2go/dasql"
+	"github.com/vkuznet/das2go/mongo"
+	"github.com/vkuznet/das2go/services"
+	"github.com/vkuznet/das2go/utils"
 )
 
 func main() {
@@ -48,7 +50,18 @@ func main() {
 		fmt.Println("\t# get results from specific CMS data-service, e.g. phedex")
 		fmt.Println("\tdasgoclient -query=\"file dataset=/ZMM/Summer11-DESIGN42_V11_428_SLHC1-v1/GEN-SIM system=phedex\" -json")
 	}
+	mode := flag.String("profileMode", "", "enable profiling mode, one of [cpu, mem, block]")
 	flag.Parse()
+	switch *mode {
+	case "cpu":
+		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	case "mem":
+		defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+	case "block":
+		defer profile.Start(profile.BlockProfile, profile.ProfilePath(".")).Stop()
+	default:
+		// do nothing
+	}
 	utils.VERBOSE = verbose
 	utils.UrlQueueLimit = 1000
 	utils.UrlRetry = 3
@@ -272,6 +285,10 @@ func process(query string, jsonout bool, sep string) {
 	if utils.VERBOSE > 0 {
 		fmt.Println("Received", len(dasrecords), "records")
 		fmt.Println("Select keys", selectKeys)
+	}
+	if len(selectKeys) == 0 {
+		fmt.Println("Unable to parse DAS query, no select keys are found", dasquery)
+		os.Exit(1)
 	}
 	if len(dasquery.Filters) > 0 {
 		printFilteredRecords(dasquery, dasrecords, sep)
