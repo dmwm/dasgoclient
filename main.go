@@ -117,7 +117,8 @@ func showExamples() {
 // global keymap for DAS keys and associate CMS data-service
 func DASKeyMap() map[string]string {
 	keyMap := map[string]string{
-		"site":    "phedex",
+		//"site":    "phedex",
+		"site":    "combined",
 		"dataset": "dbs3",
 		"block":   "dbs3",
 		"file":    "dbs3",
