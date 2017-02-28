@@ -291,15 +291,62 @@ func process(query string, jsonout bool, sep string) {
 		fmt.Println("Unable to parse DAS query, no select keys are found", dasquery)
 		os.Exit(1)
 	}
+
+	// if we use detail=True option in json format we'll dump entire dasrecords
+	if dasquery.Detail && jsonout {
+		fmt.Println("[")
+		for idx, rec := range dasrecords {
+			out, err := json.Marshal(rec)
+			if err == nil {
+				if idx < len(dasrecords)-1 {
+					fmt.Println(string(out), ",")
+				} else {
+					fmt.Println(string(out))
+				}
+			} else {
+				fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
+			}
+		}
+		fmt.Println("]")
+		os.Exit(1)
+	}
+
+	// for non-detailed output, we first get records, then convert them to a set and sort them
+	var records []string
 	if len(dasquery.Filters) > 0 {
-		printFilteredRecords(dasquery, dasrecords, sep)
+		records = getFilteredRecords(dasquery, dasrecords, sep)
 	} else {
-		printRecords(dasrecords, selectKeys, jsonout, sep)
+		records = getRecords(dasrecords, selectKeys, sep)
+	}
+	records = utils.List2Set(records)
+	sort.Sort(utils.StringList(records))
+	if jsonout {
+		fmt.Println("[")
+	}
+	for idx, rec := range records {
+		if jsonout {
+			out, err := json.Marshal(rec)
+			if err == nil {
+				if idx < len(records)-1 {
+					fmt.Println(string(out), ",")
+				} else {
+					fmt.Println(string(out))
+				}
+			} else {
+				fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
+			}
+		} else {
+			fmt.Println(rec)
+		}
+	}
+	if jsonout {
+		fmt.Println("]")
 	}
 }
 
 // helper function to extract filtered fields from DAS records
-func printFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, sep string) {
+func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, sep string) []string {
+	var records []string
 	if dasfilters, ok := dasquery.Filters["grep"]; ok {
 		var filterEntries [][]string
 		for _, filter := range dasfilters {
@@ -329,31 +376,17 @@ func printFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord,
 				out = append(out, sep)
 			}
 			if len(out) > 0 {
-				fmt.Println(strings.Join(out, ""))
+				records = append(records, strings.Join(out, ""))
 			}
 		}
 	}
+	return records
 }
 
 // helper function to print DAS records on stdout
-func printRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, jsonout bool, sep string) {
-	if jsonout {
-		fmt.Println("[")
-	}
-	for idx, rec := range dasrecords {
-		if jsonout {
-			out, err := json.Marshal(rec)
-			if err == nil {
-				if idx < len(dasrecords)-1 {
-					fmt.Println(string(out), ",")
-				} else {
-					fmt.Println(string(out))
-				}
-			} else {
-				fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
-			}
-			continue
-		}
+func getRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, sep string) []string {
+	var records []string
+	for _, rec := range dasrecords {
 		rbytes, err := mongo.GetBytesFromDASRecord(rec)
 		if err != nil {
 			fmt.Errorf("Fail to parse DAS record=%v, selKeys=%v, error=%v\n", rec, selectKeys, err)
@@ -371,13 +404,11 @@ func printRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, jsonout b
 				}
 			}
 			if len(out) > 0 {
-				fmt.Println(strings.Join(out, sep))
+				records = append(records, strings.Join(out, ""))
 			}
 		}
 	}
-	if jsonout {
-		fmt.Println("]")
-	}
+	return records
 }
 
 // helper function to get DAS records out of url response
