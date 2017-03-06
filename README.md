@@ -18,8 +18,8 @@ go get github.com/vkuznet/das2go
 go get github.com/vkuznet/x509proxy
 go get github.com/buger/jsonparser
 
-# to build DAS server run
-make
+# to build DAS Go client 
+make build_all
 ```
 
 The build will produce ```dasgoclient``` static executable which you can use as following:
