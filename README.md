@@ -17,6 +17,7 @@ go get github.com/vkuznet/cmsauth
 go get github.com/vkuznet/das2go
 go get github.com/vkuznet/x509proxy
 go get github.com/buger/jsonparser
+go get github.com/pkg/profile
 
 # to build DAS Go client 
 make build_all
