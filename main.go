@@ -39,6 +39,8 @@ func main() {
 	flag.BoolVar(&examples, "examples", false, "Show examples of supported DAS queries")
 	var daskeys bool
 	flag.BoolVar(&daskeys, "daskeys", false, "Show supported DAS keys")
+	var unique bool
+	flag.BoolVar(&unique, "unique", false, "Sort results and return unique list")
 	flag.Usage = func() {
 		fmt.Println("Usage: dasgoclient [options]")
 		flag.PrintDefaults()
@@ -72,7 +74,7 @@ func main() {
 	} else if daskeys {
 		showDASKeys()
 	} else {
-		process(query, jsonout, sep)
+		process(query, jsonout, sep, unique)
 	}
 }
 
@@ -202,7 +204,7 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 }
 
 // Process function process' given query and return back results
-func process(query string, jsonout bool, sep string) {
+func process(query string, jsonout bool, sep string, unique bool) {
 	var dmaps dasmaps.DASMaps
 	dmaps.LoadMapsFromFile()
 	dasquery, err := dasql.Parse(query, "", dmaps.DASKeys())
@@ -318,8 +320,10 @@ func process(query string, jsonout bool, sep string) {
 	} else {
 		records = getRecords(dasrecords, selectKeys, sep)
 	}
-	records = utils.List2Set(records)
-	sort.Sort(utils.StringList(records))
+	if unique {
+		records = utils.List2Set(records)
+		sort.Sort(utils.StringList(records))
+	}
 	if jsonout {
 		fmt.Println("[")
 	}
