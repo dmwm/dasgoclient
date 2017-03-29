@@ -318,7 +318,7 @@ func process(query string, jsonout bool, sep string, unique bool) {
 	if len(dasquery.Filters) > 0 {
 		records = getFilteredRecords(dasquery, dasrecords, sep)
 	} else {
-		records = getRecords(dasrecords, selectKeys, sep)
+		records = getRecords(dasrecords, selectKeys, sep, jsonout)
 	}
 	if unique {
 		records = utils.List2Set(records)
@@ -327,18 +327,26 @@ func process(query string, jsonout bool, sep string, unique bool) {
 	if jsonout {
 		fmt.Println("[")
 	}
+	//     for idx, rec := range records {
+	//         fmt.Println(rec)
+	//     }
 	for idx, rec := range records {
 		if jsonout {
-			out, err := json.Marshal(rec)
-			if err == nil {
-				if idx < len(records)-1 {
-					fmt.Println(string(out), ",")
-				} else {
-					fmt.Println(string(out))
-				}
+			if idx < len(records)-1 {
+				fmt.Println(rec, ",")
 			} else {
-				fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
+				fmt.Println(rec)
 			}
+			//             out, err := json.Marshal(rec)
+			//             if err == nil {
+			//                 if idx < len(records)-1 {
+			//                     fmt.Println(string(out), ",")
+			//                 } else {
+			//                     fmt.Println(string(out))
+			//                 }
+			//             } else {
+			//                 fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
+			//             }
 		} else {
 			fmt.Println(rec)
 		}
@@ -380,7 +388,7 @@ func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, s
 				out = append(out, sep)
 			}
 			if len(out) > 0 {
-				records = append(records, strings.Join(out, ""))
+				records = append(records, strings.Join(out, sep))
 			}
 		}
 	}
@@ -388,13 +396,21 @@ func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, s
 }
 
 // helper function to print DAS records on stdout
-func getRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, sep string) []string {
+func getRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, sep string, jsonout bool) []string {
 	var records []string
 	for _, rec := range dasrecords {
 		rbytes, err := mongo.GetBytesFromDASRecord(rec)
 		if err != nil {
 			fmt.Errorf("Fail to parse DAS record=%v, selKeys=%v, error=%v\n", rec, selectKeys, err)
 		} else {
+			if jsonout {
+				out, err := json.Marshal(rec)
+				if err != nil {
+					fmt.Errorf("Fail to marshal DAS record=%v, error=%v\n", rec, err)
+				}
+				records = append(records, string(out))
+				continue
+			}
 			var out []string
 			for _, keys := range selectKeys {
 				val, _, _, err := jsonparser.Get(rbytes, keys...)
@@ -408,7 +424,7 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, sep string)
 				}
 			}
 			if len(out) > 0 {
-				records = append(records, strings.Join(out, ""))
+				records = append(records, strings.Join(out, sep))
 			}
 		}
 	}
