@@ -1,6 +1,7 @@
 GOPATH:=$(PWD):${GOPATH}
 export GOPATH
-flags=-ldflags="-s -w"
+# flags=-ldflags="-s -w"
+flags=-ldflags="-s -w -extldflags -static"
 
 all: build
 
@@ -24,6 +25,9 @@ build_power8:
 build_arm64:
 	go clean; rm -rf pkg dasgoclient_arm64; GOARCH=arm64 GOOS=linux go build ${flags}
 	mv dasgoclient dasgoclient_arm64
+
+build_windows:
+	go clean; rm -rf pkg dasgoclient.exe; GOARCH=amd64 GOOS=windows go build ${flags}
 
 install:
 	go install
