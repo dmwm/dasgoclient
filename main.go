@@ -277,7 +277,14 @@ func process(query string, jsonout bool, sep string, unique bool) {
 				}
 			}
 		}
-		selectKeys = append(selectKeys, keys)
+		selectKeys = append(selectKeys, keys) // hold  [key [0] attribute]
+		var skeys []string
+		for _, kkk := range strings.Split(pkey, ".") {
+			if !utils.InList(kkk, skeys) {
+				skeys = append(skeys, kkk)
+			}
+		}
+		selectKeys = append(selectKeys, skeys) // hold [ key attribute ]
 	}
 	var dasrecords []mongo.DASRecord
 	if len(urls) > 0 {
@@ -327,9 +334,6 @@ func process(query string, jsonout bool, sep string, unique bool) {
 	if jsonout {
 		fmt.Println("[")
 	}
-	//     for idx, rec := range records {
-	//         fmt.Println(rec)
-	//     }
 	for idx, rec := range records {
 		if jsonout {
 			if idx < len(records)-1 {
@@ -337,16 +341,6 @@ func process(query string, jsonout bool, sep string, unique bool) {
 			} else {
 				fmt.Println(rec)
 			}
-			//             out, err := json.Marshal(rec)
-			//             if err == nil {
-			//                 if idx < len(records)-1 {
-			//                     fmt.Println(string(out), ",")
-			//                 } else {
-			//                     fmt.Println(string(out))
-			//                 }
-			//             } else {
-			//                 fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
-			//             }
 		} else {
 			fmt.Println(rec)
 		}
