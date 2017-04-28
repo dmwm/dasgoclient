@@ -265,27 +265,9 @@ func process(query string, jsonout bool, sep string, unique bool) {
 		fmt.Println("urls", urls)
 		fmt.Println("localApis", localApis)
 	}
-	// extract list of select keys we'll need to display on stdout
-	var selectKeys [][]string
-	for _, pkey := range pkeys {
-		var keys []string
-		for _, kkk := range strings.Split(pkey, ".") {
-			if !utils.InList(kkk, keys) {
-				keys = append(keys, kkk)
-				if len(keys) == 1 {
-					keys = append(keys, "[0]") // to hadle DAS records lists
-				}
-			}
-		}
-		selectKeys = append(selectKeys, keys) // hold  [key [0] attribute]
-		var skeys []string
-		for _, kkk := range strings.Split(pkey, ".") {
-			if !utils.InList(kkk, skeys) {
-				skeys = append(skeys, kkk)
-			}
-		}
-		selectKeys = append(selectKeys, skeys) // hold [ key attribute ]
-	}
+	// extract selected keys from dasquery and primary keys
+	selectKeys, selectSubKeys := selectedKeys(dasquery, pkeys)
+
 	var dasrecords []mongo.DASRecord
 	if len(urls) > 0 {
 		dasrecords = processURLs(dasquery, urls, maps, &dmaps, pkeys)
@@ -294,11 +276,6 @@ func process(query string, jsonout bool, sep string, unique bool) {
 	}
 	if utils.VERBOSE > 0 {
 		fmt.Println("Received", len(dasrecords), "records")
-		fmt.Println("Select keys", selectKeys)
-	}
-	if len(selectKeys) == 0 {
-		fmt.Println("Unable to parse DAS query, no select keys are found", dasquery)
-		os.Exit(1)
 	}
 
 	// if we use detail=True option in json format we'll dump entire dasrecords
@@ -325,7 +302,7 @@ func process(query string, jsonout bool, sep string, unique bool) {
 	if len(dasquery.Filters) > 0 {
 		records = getFilteredRecords(dasquery, dasrecords, sep)
 	} else {
-		records = getRecords(dasrecords, selectKeys, sep, jsonout)
+		records = getRecords(dasrecords, selectKeys, selectSubKeys, sep, jsonout)
 	}
 	if unique {
 		records = utils.List2Set(records)
@@ -389,8 +366,38 @@ func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, s
 	return records
 }
 
+// helper function to extract selected keys of DAS queryes from primary keys
+func selectedKeys(dasquery dasql.DASQuery, pkeys []string) ([][]string, [][]string) {
+	// extract list of select keys we'll need to display on stdout
+	var selectKeys, selectSubKeys [][]string
+	for _, pkey := range pkeys {
+		var skeys []string
+		for _, kkk := range strings.Split(pkey, ".") {
+			if !utils.InList(kkk, skeys) {
+				skeys = append(skeys, kkk)
+			}
+		}
+		selectKeys = append(selectKeys, skeys) // hold [ key attribute ]
+		var keys []string
+		for _, kkk := range strings.Split(pkey, ".") {
+			if !utils.InList(kkk, keys) {
+				keys = append(keys, kkk)
+				if len(keys) == 1 {
+					keys = append(keys, "[0]") // to hadle DAS records lists
+				}
+			}
+		}
+		selectSubKeys = append(selectSubKeys, keys) // hold  [key [0] attribute]
+	}
+	if len(selectKeys) == 0 {
+		fmt.Println("Unable to parse DAS query, no select keys are found", dasquery)
+		os.Exit(1)
+	}
+	return selectKeys, selectSubKeys
+}
+
 // helper function to print DAS records on stdout
-func getRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, sep string, jsonout bool) []string {
+func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]string, sep string, jsonout bool) []string {
 	var records []string
 	for _, rec := range dasrecords {
 		rbytes, err := mongo.GetBytesFromDASRecord(rec)
@@ -419,6 +426,21 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys [][]string, sep string,
 			}
 			if len(out) > 0 {
 				records = append(records, strings.Join(out, sep))
+			} else { // try out [key [0] attribute]
+				for _, keys := range selectSubKeys {
+					val, _, _, err := jsonparser.Get(rbytes, keys...)
+					if err == nil {
+						sval := string(val)
+						if !utils.InList(sval, out) {
+							out = append(out, sval)
+						}
+					} else {
+						fmt.Errorf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
+					}
+				}
+				if len(out) > 0 {
+					records = append(records, strings.Join(out, sep))
+				}
 			}
 		}
 	}
