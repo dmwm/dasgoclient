@@ -111,7 +111,7 @@ func checkX509() {
 		fmt.Println("Neither X509_USER_PROXY or X509_USER_KEY/X509_USER_CERT are set")
 		fmt.Println("In order to run please obtain valid proxy via \"voms-proxy-init -voms cms -rfc\"")
 		fmt.Println("and setup X509_USER_PROXY or setup X509_USER_KEY/X509_USER_CERT in your environment")
-		os.Exit(-1)
+		os.Exit(1)
 	}
 }
 
@@ -225,15 +225,23 @@ func process(query string, jsonout bool, sep string, unique bool, format string)
 
 	// find out list of APIs/CMS services which can process this query request
 	maps := dmaps.FindServices(dasquery.Instance, dasquery.Fields, dasquery.Spec)
-	var srvs, pkeys []string
+	var srvs, pkeys, mapServices []string
 	urls := make(map[string]string)
 	var localApis []mongo.DASRecord
 	var furl string
+	for _, dmap := range maps {
+		if v, ok := dmap["system"]; ok {
+			srv := v.(string)
+			if !utils.InList(srv, mapServices) {
+				mapServices = append(mapServices, srv)
+			}
+		}
+	}
 	// loop over services and fetch data
 	for _, dmap := range maps {
 		args := ""
 		system, _ := dmap["system"].(string)
-		if skipSystem(dasquery, system) && len(maps) > 1 {
+		if skipSystem(dasquery, system) && len(mapServices) > 1 {
 			continue
 		}
 		if system == "runregistry" {
@@ -293,12 +301,13 @@ func process(query string, jsonout bool, sep string, unique bool, format string)
 	if format == "json" {
 		jsonout = true
 		ctime := time.Now().Unix() - time0
+		// add status wrapper to be compatible with das_client.py
 		fmt.Printf("{\"status\":\"ok\", \"mongo_query\":%s, \"nresults\":1, \"timestamp\":%d, \"ctime\":%d, \"data\":", dasquery.Marshall(), time.Now().Unix(), ctime)
 	}
 
 	// if we use detail=True option in json format we'll dump entire dasrecords
 	if dasquery.Detail && jsonout {
-		fmt.Println("[")
+		fmt.Println("[") // data output goes here
 		for idx, rec := range dasrecords {
 			out, err := json.Marshal(rec)
 			if err == nil {
@@ -309,10 +318,12 @@ func process(query string, jsonout bool, sep string, unique bool, format string)
 				}
 			} else {
 				fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
+				os.Exit(1)
 			}
 		}
-		fmt.Println("]")
-		os.Exit(1)
+		fmt.Println("]") // end of data output
+		fmt.Println("}") // end of status wrapper
+		os.Exit(0)
 	}
 
 	// for non-detailed output, we first get records, then convert them to a set and sort them
