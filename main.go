@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/user"
 	"reflect"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -47,6 +48,8 @@ func main() {
 	flag.IntVar(&verbose, "verbose", 0, "Verbose level, support 0,1,2")
 	var examples bool
 	flag.BoolVar(&examples, "examples", false, "Show examples of supported DAS queries")
+	var version bool
+	flag.BoolVar(&version, "version", false, "Show version")
 	var daskeys bool
 	flag.BoolVar(&daskeys, "daskeys", false, "Show supported DAS keys")
 	var unique bool
@@ -81,11 +84,19 @@ func main() {
 	checkX509()
 	if examples {
 		showExamples()
+	} else if version {
+		fmt.Println(info())
 	} else if daskeys {
 		showDASKeys()
 	} else {
 		process(query, jsonout, sep, unique, format)
 	}
+}
+
+func info() string {
+	goVersion := runtime.Version()
+	tstamp := time.Now()
+	return fmt.Sprintf("Build: git={{VERSION}} go=%s date=%s", goVersion, tstamp)
 }
 
 // helper function to check X509 settings
