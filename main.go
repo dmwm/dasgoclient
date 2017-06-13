@@ -39,7 +39,7 @@ func main() {
 	var idx int
 	flag.IntVar(&idx, "idx", 0, "Compatibility option with python das_client, has no effect")
 	var host string
-	flag.StringVar(&host, "host", "https://cmsweb.cern.ch", "Compatibility option with python das_client, has no effect")
+	flag.StringVar(&host, "host", "https://cmsweb.cern.ch", "Specify hostname to talk to")
 	var threshold int
 	flag.IntVar(&threshold, "threshold", 0, "Compatibility option with python das_client, has no effect")
 	var sep string
@@ -89,7 +89,7 @@ func main() {
 	} else if daskeys {
 		showDASKeys()
 	} else {
-		process(query, jsonout, sep, unique, format)
+		process(query, jsonout, sep, unique, format, host)
 	}
 }
 
@@ -225,10 +225,14 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 }
 
 // Process function process' given query and return back results
-func process(query string, jsonout bool, sep string, unique bool, format string) {
+func process(query string, jsonout bool, sep string, unique bool, format, host string) {
 	time0 := time.Now().Unix()
 	var dmaps dasmaps.DASMaps
 	dmaps.LoadMapsFromFile()
+	if !strings.Contains(host, "cmsweb.cern.ch") {
+		dmaps.ChangeUrl("https://cmsweb.cern.ch", host)
+		dmaps.ChangeUrl("prod/global", "int/global")
+	}
 	dasquery, err := dasql.Parse(query, "", dmaps.DASKeys())
 	if utils.VERBOSE > 0 {
 		fmt.Println(dasquery, err)
