@@ -1,8 +1,8 @@
 # dasgoclient
 
-[![Build Status](https://travis-ci.org/vkuznet/dasgoclient.svg?branch=master)](https://travis-ci.org/vkuznet/dasgoclient)
-[![Go Report Card](https://goreportcard.com/badge/github.com/vkuznet/dasgoclient)](https://goreportcard.com/report/github.com/vkuznet/dasgoclient)
-[![GoDoc](https://godoc.org/github.com/vkuznet/dasgoclient?status.svg)](https://godoc.org/github.com/vkuznet/dasgoclient)
+[![Build Status](https://travis-ci.org/dmwm/dasgoclient.svg?branch=master)](https://travis-ci.org/dmwm/dasgoclient)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dmwm/dasgoclient)](https://goreportcard.com/report/github.com/dmwm/dasgoclient)
+[![GoDoc](https://godoc.org/github.com/dmwm/dasgoclient?status.svg)](https://godoc.org/github.com/dmwm/dasgoclient)
 [![DOI](https://zenodo.org/badge/78777726.svg)](https://zenodo.org/badge/78777726.svg)
 
 Go implementation of DAS (Data Aggregation System) client for CMS data-services
@@ -13,8 +13,8 @@ To compile the client you need a Go compiler, then perform the following:
 
 ```
 # one time operation, setup your GOPATH and download the following
-go get github.com/vkuznet/cmsauth
-go get github.com/vkuznet/das2go
+go get github.com/dmwm/cmsauth
+go get github.com/dmwm/das2go
 go get github.com/vkuznet/x509proxy
 go get github.com/buger/jsonparser
 go get github.com/pkg/profile
@@ -82,7 +82,7 @@ Entering interactive mode (type "help" for commands)
 20ms of 20ms total (  100%)
 Showing top 10 nodes out of 20 (cum >= 10ms)
       flat  flat%   sum%        cum   cum%
-      10ms 50.00% 50.00%       10ms 50.00%  github.com/vkuznet/das2go/services.Unmarshal
+      10ms 50.00% 50.00%       10ms 50.00%  github.com/dmwm/das2go/services.Unmarshal
       10ms 50.00%   100%       10ms 50.00%  runtime.memmove
          0     0%   100%       10ms 50.00%  crypto/rsa.(*PrivateKey).Sign
          0     0%   100%       10ms 50.00%  crypto/rsa.SignPKCS1v15
