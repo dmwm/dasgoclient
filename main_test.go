@@ -2,9 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"os/exec"
 	"reflect"
 	"sort"
@@ -16,31 +15,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// helper function to perform DAS query and capture its output
-func runDASQuery(query string) ([]byte, error) {
-	host := "https://cmsweb.cern.ch"
-	old := os.Stdout // keep backup of the real stdout
-	r, w, e := os.Pipe()
-	if e != nil {
-		return nil, e
+var exe string
+
+func init() {
+	flag.StringVar(&exe, "exe", "", "dasgoclient executable to run")
+	flag.Parse()
+	if exe == "" {
+		panic("Unable to find dasgoclient executable, please provide as -exe=/path/dasgoclient")
 	}
-	//     defer w.Close()
-	//     defer r.Close()
-	os.Stdout = w
-
-	process(query, true, " ", false, "json", host)
-
-	// back to normal state
-	w.Close()
-	out, err := ioutil.ReadAll(r)
-	os.Stdout = old // restoring the real stdout
-	return out, err
 }
 
+// helper function to perform DAS query and capture its output
 func runCommand(query string) ([]byte, error) {
-	path := "/Users/vk/Work/Languages/Go/gopath/src/github.com/dmwm/dasgoclient"
-	cmd := fmt.Sprintf("%s/dasgoclient", path)
-	out, err := exec.Command(cmd, "-query", query, "-format", "json").Output()
+	//     path := "/Users/vk/Work/Languages/Go/gopath/src/github.com/dmwm/dasgoclient"
+	//     cmd := fmt.Sprintf("%s/dasgoclient", path)
+	out, err := exec.Command(exe, "-query", query, "-format", "json").Output()
 	return out, err
 }
 
