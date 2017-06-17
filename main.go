@@ -209,6 +209,11 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 	if len(dasquery.Fields) > 1 { // multiple keys
 		return false
 	}
+	fields := dasquery.Fields
+	specKeys := utils.MapKeys(dasquery.Spec)
+	if len(fields) == 1 && len(specKeys) == 1 && fields[0] == specKeys[0] { // e.g. site=T3_*
+		return false
+	}
 	keyMap := DASKeyMap()
 	if dasquery.System == "" {
 		for _, key := range dasquery.Fields {
