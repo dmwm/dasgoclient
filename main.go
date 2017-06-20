@@ -35,9 +35,9 @@ func main() {
 	var format string
 	flag.StringVar(&format, "format", "", "Compatibility option with python das_client, use json to get das_client behavior")
 	var limit int
-	flag.IntVar(&limit, "limit", 0, "Compatibility option with python das_client, has no effect")
+	flag.IntVar(&limit, "limit", 0, "Compatibility option with python das_client")
 	var idx int
-	flag.IntVar(&idx, "idx", 0, "Compatibility option with python das_client, has no effect")
+	flag.IntVar(&idx, "idx", 0, "Compatibility option with python das_client")
 	var host string
 	flag.StringVar(&host, "host", "https://cmsweb.cern.ch", "Specify hostname to talk to")
 	var threshold int
@@ -89,7 +89,7 @@ func main() {
 	} else if daskeys {
 		showDASKeys()
 	} else {
-		process(query, jsonout, sep, unique, format, host)
+		process(query, jsonout, sep, unique, format, host, idx, limit)
 	}
 }
 
@@ -230,7 +230,7 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 }
 
 // Process function process' given query and return back results
-func process(query string, jsonout bool, sep string, unique bool, format, host string) {
+func process(query string, jsonout bool, sep string, unique bool, format, host string, rdx, limit int) {
 	time0 := time.Now().Unix()
 	var dmaps dasmaps.DASMaps
 	dmaps.LoadMapsFromFile()
@@ -318,20 +318,27 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	}
 
 	// if user provides format option we'll add extra fields to be compatible with das_client
-	if format == "json" {
+	if strings.ToLower(format) == "json" {
 		jsonout = true
 		ctime := time.Now().Unix() - time0
 		// add status wrapper to be compatible with das_client.py
-		fmt.Printf("{\"status\":\"ok\", \"mongo_query\":%s, \"nresults\":1, \"timestamp\":%d, \"ctime\":%d, \"data\":", dasquery.Marshall(), time.Now().Unix(), ctime)
+		fmt.Printf("{\"status\":\"ok\", \"mongo_query\":%s, \"nresults\":%d, \"timestamp\":%d, \"ctime\":%d, \"data\":", dasquery.Marshall(), len(dasrecords), time.Now().Unix(), ctime)
 	}
 
 	// if we use detail=True option in json format we'll dump entire dasrecords
 	if dasquery.Detail && jsonout {
 		fmt.Println("[") // data output goes here
 		for idx, rec := range dasrecords {
+			if idx < rdx {
+				continue
+			}
 			out, err := json.Marshal(rec)
 			if err == nil {
 				if idx < len(dasrecords)-1 {
+					if limit > 0 && limit == idx+1 {
+						fmt.Println(string(out))
+						break
+					}
 					fmt.Println(string(out), ",")
 				} else {
 					fmt.Println(string(out))
@@ -349,7 +356,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	// for non-detailed output, we first get records, then convert them to a set and sort them
 	var records []string
 	if len(dasquery.Filters) > 0 {
-		if format == "json" {
+		if strings.ToLower(format) == "json" {
 			// TODO: to simplify so far I'll ignore filters since records should be returned as dict
 			// but later I need to adjust code to return only filter's attribute
 			records = getRecords(dasrecords, selectKeys, selectSubKeys, sep, jsonout)
@@ -367,13 +374,23 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		fmt.Println("[")
 	}
 	for idx, rec := range records {
+		if idx < rdx {
+			continue
+		}
 		if jsonout {
 			if idx < len(records)-1 {
+				if limit > 0 && limit == idx+1 {
+					fmt.Println(rec)
+					break
+				}
 				fmt.Println(rec, ",")
 			} else {
 				fmt.Println(rec)
 			}
 		} else {
+			if limit > 0 && limit == idx {
+				break
+			}
 			fmt.Println(rec)
 		}
 	}
@@ -381,7 +398,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		fmt.Println("]")
 	}
 
-	if format == "json" {
+	if strings.ToLower(format) == "json" {
 		fmt.Printf("}")
 	}
 }
