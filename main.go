@@ -272,6 +272,13 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 				args = fmt.Sprintf("{\"filter\": {\"number\": \">= %s and <= %s\"}}", v[0], v[len(v)-1])
 			}
 			furl, _ = dmap["url"].(string)
+			// Adjust url to use custom columns
+			columns := "number%2CstartTime%2CstopTime%2Ctriggers%2CrunClassName%2CrunStopReason%2Cbfield%2CgtKey%2Cl1Menu%2ChltKeyDescription%2ClhcFill%2ClhcEnergy%2CrunCreated%2Cmodified%2ClsCount%2ClsRanges"
+			if furl[len(furl)-1:] == "/" { // look-up last slash
+				furl = fmt.Sprintf("%sapi/GLOBAL/runsummary/json/%s/none/data", furl, columns)
+			} else {
+				furl = fmt.Sprintf("%s/api/GLOBAL/runsummary/json/%s/none/data", furl, columns)
+			}
 		} else if system == "reqmgr" || system == "mcm" {
 			furl = das.FormRESTUrl(dasquery, dmap)
 		} else {
