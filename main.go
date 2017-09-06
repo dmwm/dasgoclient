@@ -244,7 +244,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	}
 
 	// find out list of APIs/CMS services which can process this query request
-	maps := dmaps.FindServices(dasquery.Instance, dasquery.Fields, dasquery.Spec)
+	maps := dmaps.FindServices(dasquery)
 	var srvs, pkeys, mapServices []string
 	urls := make(map[string]string)
 	var localApis []mongo.DASRecord
