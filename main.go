@@ -557,7 +557,7 @@ func response2Records(r *utils.ResponseType, dasquery dasql.DASQuery, maps []mon
 	}
 	// process data records
 	notations := dmaps.FindNotations(system)
-	records := services.Unmarshal(system, urn, r.Data, notations)
+	records := services.Unmarshal(dasquery, system, urn, *r, notations, pkeys)
 	records = services.AdjustRecords(dasquery, system, urn, records, expire, pkeys)
 
 	// add records
