@@ -81,6 +81,7 @@ func main() {
 	utils.UrlQueueLimit = 1000
 	utils.UrlRetry = 3
 	utils.WEBSERVER = 0
+	utils.CLIENT_VERSION = "{{VERSION}}"
 	checkX509()
 	if examples {
 		showExamples()
