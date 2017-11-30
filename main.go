@@ -258,11 +258,27 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 			}
 		}
 	}
+	// loop over services and select which one(s) we'll use
+	var selectedServices []string
+	for _, dmap := range maps {
+		system, _ := dmap["system"].(string)
+		if skipSystem(dasquery, system) && len(mapServices) > 1 {
+			continue
+		}
+		selectedServices = append(selectedServices, system)
+	}
+	// if nothing is selected use original from the map
+	if len(selectedServices) == 0 {
+		selectedServices = mapServices
+	}
 	// loop over services and fetch data
 	for _, dmap := range maps {
 		args := ""
 		system, _ := dmap["system"].(string)
-		if skipSystem(dasquery, system) && len(mapServices) > 1 {
+		//         if skipSystem(dasquery, system) && len(mapServices) > 1 {
+		//             continue
+		//         }
+		if !utils.InList(system, selectedServices) {
 			continue
 		}
 		if system == "runregistry" {
