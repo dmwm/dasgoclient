@@ -373,7 +373,9 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 			}
 		}
 		fmt.Println("]") // end of data output
-		fmt.Println("}") // end of status wrapper
+		if strings.ToLower(format) == "json" {
+			fmt.Println("}") // end of status wrapper
+		}
 		os.Exit(0)
 	}
 
@@ -592,9 +594,12 @@ func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.D
 	var dasrecords []mongo.DASRecord
 	if len(urls) == 1 {
 		for furl, args := range urls {
-			if !dasquery.Detail && strings.Contains(furl, "detail=True") {
-				furl = strings.Replace(furl, "detail=True", "detail=False", -1)
+			if dasquery.Detail && strings.Contains(furl, "detail=False") {
+				furl = strings.Replace(furl, "detail=False", "detail=True", -1)
 			}
+			//             if !dasquery.Detail && strings.Contains(furl, "detail=True") {
+			//                 furl = strings.Replace(furl, "detail=True", "detail=False", -1)
+			//             }
 			resp := utils.FetchResponse(furl, args)
 			return response2Records(&resp, dasquery, maps, dmaps, pkeys)
 		}
@@ -603,9 +608,12 @@ func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.D
 	defer close(out)
 	umap := map[string]int{}
 	for furl, args := range urls {
-		if !dasquery.Detail && strings.Contains(furl, "detail=True") {
-			furl = strings.Replace(furl, "detail=True", "detail=False", -1)
+		if dasquery.Detail && strings.Contains(furl, "detail=False") {
+			furl = strings.Replace(furl, "detail=False", "detail=True", -1)
 		}
+		//         if !dasquery.Detail && strings.Contains(furl, "detail=True") {
+		//             furl = strings.Replace(furl, "detail=True", "detail=False", -1)
+		//         }
 		umap[furl] = 1 // keep track of processed urls below
 		go utils.Fetch(furl, args, out)
 	}
