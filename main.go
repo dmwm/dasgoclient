@@ -139,15 +139,14 @@ func showExamples() {
 }
 
 // global keymap for DAS keys and associate CMS data-service
-func DASKeyMap() map[string]string {
-	keyMap := map[string]string{
-		//"site":    "phedex",
-		"site":    "combined",
-		"dataset": "dbs3",
-		"block":   "dbs3",
-		"file":    "dbs3",
-		"run":     "runregistry",
-		"config":  "reqmgr2",
+func DASKeyMap() map[string][]string {
+	keyMap := map[string][]string{
+		"site":    []string{"combined", "dbs3"},
+		"dataset": []string{"dbs3"},
+		"block":   []string{"dbs3"},
+		"file":    []string{"dbs3"},
+		"run":     []string{"runregistry", "dbs3"},
+		"config":  []string{"reqmgr2"},
 	}
 	return keyMap
 }
@@ -218,7 +217,8 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 	keyMap := DASKeyMap()
 	if dasquery.System == "" {
 		for _, key := range dasquery.Fields {
-			if keyMap[key] != "" && system != "" && keyMap[key] != system {
+			srvs := keyMap[key]
+			if !utils.InList(system, srvs) {
 				return true
 			}
 		}
@@ -275,9 +275,6 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	for _, dmap := range maps {
 		args := ""
 		system, _ := dmap["system"].(string)
-		//         if skipSystem(dasquery, system) && len(mapServices) > 1 {
-		//             continue
-		//         }
 		if !utils.InList(system, selectedServices) {
 			continue
 		}
@@ -324,18 +321,23 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		}
 	}
 	if utils.VERBOSE > 0 {
-		fmt.Println("srvs", srvs, pkeys)
-		fmt.Println("urls", urls)
-		fmt.Println("localApis", localApis)
+		fmt.Println("### selected services", srvs, pkeys)
+		fmt.Println("### selected urls", urls)
+		fmt.Println("### selected localApis", localApis)
 	}
 	// extract selected keys from dasquery and primary keys
 	selectKeys, selectSubKeys := selectedKeys(dasquery, pkeys)
 
 	var dasrecords []mongo.DASRecord
 	if len(urls) > 0 {
-		dasrecords = processURLs(dasquery, urls, maps, &dmaps, pkeys)
-	} else if len(localApis) > 0 {
-		dasrecords = processLocalApis(dasquery, localApis, pkeys)
+		for _, r := range processURLs(dasquery, urls, maps, &dmaps, pkeys) {
+			dasrecords = append(dasrecords, r)
+		}
+	}
+	if len(localApis) > 0 {
+		for _, r := range processLocalApis(dasquery, localApis, pkeys) {
+			dasrecords = append(dasrecords, r)
+		}
 	}
 	if utils.VERBOSE > 0 {
 		fmt.Println("Received", len(dasrecords), "records")
