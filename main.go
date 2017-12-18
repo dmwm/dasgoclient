@@ -243,6 +243,13 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	if utils.VERBOSE > 0 {
 		fmt.Println(dasquery, err)
 	}
+	// check dasquery and overwrite unique filter for everything except file
+	if !unique && !utils.InList("file", dasquery.Fields) && !dasquery.Detail {
+		unique = true
+	}
+	if utils.VERBOSE > 0 {
+		fmt.Println("### unique", unique)
+	}
 
 	// find out list of APIs/CMS services which can process this query request
 	maps := dmaps.FindServices(dasquery)
