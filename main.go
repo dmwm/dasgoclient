@@ -141,7 +141,7 @@ func showExamples() {
 // global keymap for DAS keys and associate CMS data-service
 func DASKeyMap() map[string][]string {
 	keyMap := map[string][]string{
-		"site":    []string{"combined", "dbs3"},
+		"site":    []string{"combined"},
 		"dataset": []string{"dbs3"},
 		"block":   []string{"dbs3"},
 		"file":    []string{"dbs3"},
@@ -348,6 +348,29 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	}
 	if utils.VERBOSE > 0 {
 		fmt.Println("Received", len(dasrecords), "records")
+	}
+
+	// check if site query returns nothing and then look-up data in DBS3
+	if len(dasrecords) == 0 && utils.InList("site", dasquery.Fields) {
+		fmt.Println("WARNING: No site records found in PhEDEx, will look-up original sites in DBS")
+		dasquery.System = "dbs3"
+		selectedServices = []string{"dbs3"}
+		args := ""
+		for _, dmap := range maps {
+			system, _ := dmap["system"].(string)
+			if !utils.InList(system, selectedServices) {
+				continue
+			}
+			furl = das.FormUrlCall(dasquery, dmap)
+		}
+		if furl != "" {
+			if _, ok := urls[furl]; !ok {
+				urls[furl] = args
+			}
+		}
+		for _, r := range processURLs(dasquery, urls, maps, &dmaps, pkeys) {
+			dasrecords = append(dasrecords, r)
+		}
 	}
 
 	// if user provides format option we'll add extra fields to be compatible with das_client
