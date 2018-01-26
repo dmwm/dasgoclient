@@ -1,7 +1,11 @@
 GOPATH:=$(PWD):${GOPATH}
 export GOPATH
-# flags=-ldflags="-s -w"
+OS := $(shell uname)
+ifeq ($(OS),Darwin)
+flags=-ldflags="-s -w"
+else
 flags=-ldflags="-s -w -extldflags -static"
+endif
 TAG := $(shell git tag | sort -r | head -n 1)
 
 all: build
@@ -11,7 +15,7 @@ build:
 	go clean; rm -rf pkg dasgoclient*; go build ${flags}
 	sed -i -e "s,$(TAG),{{VERSION}},g" main.go
 
-build_all: build build_osx build_linux build_power8 build_arm64
+build_all: build_osx build_linux build_power8 build_arm64 build_windows
 
 build_osx:
 	sed -i -e "s,{{VERSION}},$(TAG),g" main.go
