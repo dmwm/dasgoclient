@@ -233,6 +233,9 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 // Process function process' given query and return back results
 func process(query string, jsonout bool, sep string, unique bool, format, host string, rdx, limit int) {
 	time0 := time.Now().Unix()
+	if strings.ToLower(format) == "json" {
+		jsonout = true
+	}
 	var dmaps dasmaps.DASMaps
 	dmaps.LoadMapsFromFile()
 	if !strings.Contains(host, "cmsweb.cern.ch") {
@@ -352,7 +355,9 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 
 	// check if site query returns nothing and then look-up data in DBS3
 	if len(dasrecords) == 0 && utils.InList("site", dasquery.Fields) {
-		fmt.Println("WARNING: No site records found in PhEDEx, will look-up original sites in DBS")
+		if !jsonout {
+			fmt.Println("WARNING: No site records found in PhEDEx, will look-up original sites in DBS")
+		}
 		dasquery.System = "dbs3"
 		selectedServices = []string{"dbs3"}
 		args := ""
@@ -375,7 +380,6 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 
 	// if user provides format option we'll add extra fields to be compatible with das_client
 	if strings.ToLower(format) == "json" {
-		jsonout = true
 		ctime := time.Now().Unix() - time0
 		// add status wrapper to be compatible with das_client.py
 		fmt.Printf("{\"status\":\"ok\", \"mongo_query\":%s, \"nresults\":%d, \"timestamp\":%d, \"ctime\":%d, \"data\":", dasquery.Marshall(), len(dasrecords), time.Now().Unix(), ctime)
