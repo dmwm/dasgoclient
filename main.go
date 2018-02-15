@@ -44,6 +44,8 @@ func main() {
 	flag.IntVar(&threshold, "threshold", 0, "Compatibility option with python das_client, has no effect")
 	var sep string
 	flag.StringVar(&sep, "sep", " ", "Separator to use")
+	var dasmaps string
+	flag.StringVar(&dasmaps, "dasmaps", "", "Specify location of dasmaps")
 	var verbose int
 	flag.IntVar(&verbose, "verbose", 0, "Verbose level, support 0,1,2")
 	var examples bool
@@ -77,6 +79,7 @@ func main() {
 	default:
 		// do nothing
 	}
+	utils.DASMAPS = dasmaps
 	utils.VERBOSE = verbose
 	utils.UrlQueueLimit = 1000
 	utils.UrlRetry = 3
