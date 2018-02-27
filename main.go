@@ -541,6 +541,22 @@ func selectedKeys(dasquery dasql.DASQuery, pkeys []string) ([][]string, [][]stri
 func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]string, sep string, jsonout bool) []string {
 	var records []string
 	for _, rec := range dasrecords {
+		das := rec["das"].(mongo.DASRecord)
+		pkey := das["primary_key"].(string)
+		lkey := strings.Split(pkey, ".")[0]
+		skip := false
+		for _, r := range rec[lkey].([]mongo.DASRecord) {
+			recErr := r["error"]
+			if recErr != nil {
+				skip = true
+				if utils.VERBOSE > 0 {
+					fmt.Println(recErr)
+				}
+			}
+		}
+		if !jsonout && skip {
+			continue
+		}
 		rbytes, err := mongo.GetBytesFromDASRecord(rec)
 		if err != nil {
 			fmt.Errorf("Fail to parse DAS record=%v, selKeys=%v, error=%v\n", rec, selectKeys, err)
