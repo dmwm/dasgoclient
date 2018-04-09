@@ -133,11 +133,19 @@ func checkX509() {
 // helper function to show examples of DAS queries
 func showExamples() {
 	examples := []string{"block_queries.txt", "file_queries.txt", "lumi_queries.txt", "mcm_queries.txt", "run_queries.txt", "dataset_queries.txt", "jobsummary_queries.txt", "misc_queries.txt", "site_queries.txt"}
+	var home string
+	for _, item := range os.Environ() {
+		value := strings.Split(item, "=")
+		if value[0] == "HOME" {
+			home = value[1]
+			break
+		}
+	}
 	for _, fname := range examples {
 		arr := strings.Split(fname, "_")
 		msg := fmt.Sprintf("### %s queries:\n", arr[0])
 		fmt.Println(strings.ToTitle(msg))
-		fmt.Println(utils.LoadExamples(fname))
+		fmt.Println(utils.LoadExamples(fname, home))
 	}
 }
 
