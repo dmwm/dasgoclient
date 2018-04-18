@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
 	"os/exec"
 	"reflect"
 	"sort"
@@ -52,8 +53,16 @@ func TestStatus(t *testing.T) {
 	recKeys := []string{"status", "mongo_query", "nresults", "timestamp", "ctime", "data"}
 	sort.Sort(utils.StringList(recKeys))
 	var rec mongo.DASRecord
+	var home string
+	for _, item := range os.Environ() {
+		value := strings.Split(item, "=")
+		if value[0] == "HOME" {
+			home = value[1]
+			break
+		}
+	}
 	for _, fname := range examples {
-		for _, query := range strings.Split(utils.LoadExamples(fname), "\n") {
+		for _, query := range strings.Split(utils.LoadExamples(fname, home), "\n") {
 			if len(query) > 0 && string(query[0]) != "#" {
 
 				// process DAS query
