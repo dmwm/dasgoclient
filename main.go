@@ -553,12 +553,26 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 		pkey := das["primary_key"].(string)
 		lkey := strings.Split(pkey, ".")[0]
 		skip := false
-		for _, r := range rec[lkey].([]mongo.DASRecord) {
-			recErr := r["error"]
-			if recErr != nil {
-				skip = true
-				if utils.VERBOSE > 0 {
-					fmt.Println(recErr)
+		switch rrr := rec[lkey].(type) {
+		case []mongo.DASRecord:
+			for _, r := range rrr {
+				recErr := r["error"]
+				if recErr != nil {
+					skip = true
+					if utils.VERBOSE > 0 {
+						fmt.Println(recErr)
+					}
+				}
+			}
+		case []interface{}:
+			for _, r := range rrr {
+				v := r.(map[string]interface{})
+				recErr := v["error"]
+				if recErr != nil {
+					skip = true
+					if utils.VERBOSE > 0 {
+						fmt.Println(recErr)
+					}
 				}
 			}
 		}
