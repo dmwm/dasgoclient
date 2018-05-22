@@ -56,6 +56,10 @@ func main() {
 	flag.BoolVar(&daskeys, "daskeys", false, "Show supported DAS keys")
 	var unique bool
 	flag.BoolVar(&unique, "unique", false, "Sort results and return unique list")
+	var timeout int
+	flag.IntVar(&timeout, "timeout", 0, "Timeout for url call")
+	var urlRetry int
+	flag.IntVar(&urlRetry, "urlRetry", 3, "urlRetry for url call")
 	flag.Usage = func() {
 		fmt.Println("Usage: dasgoclient [options]")
 		flag.PrintDefaults()
@@ -82,8 +86,9 @@ func main() {
 	utils.DASMAPS = dasmaps
 	utils.VERBOSE = verbose
 	utils.UrlQueueLimit = 1000
-	utils.UrlRetry = 3
+	utils.UrlRetry = urlRetry
 	utils.WEBSERVER = 0
+	utils.TIMEOUT = timeout
 	utils.CLIENT_VERSION = "{{VERSION}}"
 	checkX509()
 	if examples {
