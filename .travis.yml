@@ -1,10 +1,11 @@
 language: go
 sudo: false
 go:
-  - 1.7
+  - 1.9
 install:
   - go get github.com/dmwm/cmsauth
   - go get github.com/dmwm/das2go
   - go get github.com/vkuznet/x509proxy
   - go get github.com/buger/jsonparser
   - go get github.com/pkg/profile
+  - go get github.com/stretchr/testify
