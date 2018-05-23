@@ -54,6 +54,8 @@ func main() {
 	flag.BoolVar(&version, "version", false, "Show version")
 	var daskeys bool
 	flag.BoolVar(&daskeys, "daskeys", false, "Show supported DAS keys")
+	var errorCodes bool
+	flag.BoolVar(&errorCodes, "errorCodes", false, "Show DAS error codes")
 	var unique bool
 	flag.BoolVar(&unique, "unique", false, "Sort results and return unique list")
 	var timeout int
@@ -97,9 +99,55 @@ func main() {
 		fmt.Println(info())
 	} else if daskeys {
 		showDASKeys()
+	} else if errorCodes {
+		showDASErrorCodes()
 	} else {
 		process(query, jsonout, sep, unique, format, host, idx, limit)
 	}
+}
+
+// helper function to check DAS records and return first error code, otherwise 0
+func checkDASrecords(dasrecords []mongo.DASRecord) int {
+	for _, r := range dasrecords {
+		das := r["das"].(mongo.DASRecord)
+		if das["error"] != nil {
+			ecode := das["code"]
+			if ecode != nil {
+				return ecode.(int)
+			}
+			return utils.DASServerError
+		}
+		key := das["primary_key"].(string)
+		pkey := strings.Split(key, ".")[0]
+		for _, v := range r[pkey].([]mongo.DASRecord) {
+			e := v["error"]
+			if e != nil {
+				ecode := v["code"]
+				if ecode != nil {
+					return ecode.(int)
+				}
+				return utils.DASServerError
+			}
+		}
+	}
+	return 0
+}
+
+func showDASErrorCodes() {
+	fmt.Println("DAS error codes:")
+	fmt.Printf("%v %s\n", utils.DASServerError, utils.DASServerErrorName)
+	fmt.Printf("%v %s\n", utils.DBSError, utils.DBSErrorName)
+	fmt.Printf("%v %s\n", utils.PhedexError, utils.PhedexErrorName)
+	fmt.Printf("%v %s\n", utils.ReqMgrError, utils.ReqMgrErrorName)
+	fmt.Printf("%v %s\n", utils.RunRegistryError, utils.RunRegistryErrorName)
+	fmt.Printf("%v %s\n", utils.McMError, utils.McMErrorName)
+	fmt.Printf("%v %s\n", utils.DashboardError, utils.DashboardErrorName)
+	fmt.Printf("%v %s\n", utils.SiteDBError, utils.SiteDBErrorName)
+	fmt.Printf("%v %s\n", utils.CondDBError, utils.CondDBErrorName)
+	fmt.Printf("%v %s\n", utils.CombinedError, utils.CombinedErrorName)
+	fmt.Printf("%v %s\n", utils.MongoDBError, utils.MongoDBErrorName)
+	fmt.Printf("%v %s\n", utils.DASProxyError, utils.DASProxyErrorName)
+	fmt.Printf("%v %s\n", utils.DASQueryError, utils.DASQueryErrorName)
 }
 
 func info() string {
@@ -131,7 +179,7 @@ func checkX509() {
 		fmt.Println("Neither X509_USER_PROXY or X509_USER_KEY/X509_USER_CERT are set")
 		fmt.Println("In order to run please obtain valid proxy via \"voms-proxy-init -voms cms -rfc\"")
 		fmt.Println("and setup X509_USER_PROXY or setup X509_USER_KEY/X509_USER_CERT in your environment")
-		os.Exit(1)
+		os.Exit(utils.DASProxyError)
 	}
 }
 
@@ -406,6 +454,8 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		}
 	}
 
+	ecode := checkDASrecords(dasrecords)
+
 	// if user provides format option we'll add extra fields to be compatible with das_client
 	if strings.ToLower(format) == "json" {
 		ctime := time.Now().Unix() - time0
@@ -433,14 +483,14 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 				}
 			} else {
 				fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
-				os.Exit(1)
+				os.Exit(utils.DASServerError)
 			}
 		}
 		fmt.Println("]") // end of data output
 		if strings.ToLower(format) == "json" {
 			fmt.Println("}") // end of status wrapper
 		}
-		os.Exit(0)
+		os.Exit(ecode)
 	}
 
 	// for non-detailed output, we first get records, then convert them to a set and sort them
@@ -491,6 +541,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	if strings.ToLower(format) == "json" {
 		fmt.Printf("}")
 	}
+	os.Exit(ecode)
 }
 
 // helper function to extract filtered fields from DAS records
@@ -557,7 +608,7 @@ func selectedKeys(dasquery dasql.DASQuery, pkeys []string) ([][]string, [][]stri
 	}
 	if len(selectKeys) == 0 {
 		fmt.Println("Unable to parse DAS query, no select keys are found", dasquery)
-		os.Exit(1)
+		os.Exit(utils.DASQueryError)
 	}
 	return selectKeys, selectSubKeys
 }
