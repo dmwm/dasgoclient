@@ -54,8 +54,8 @@ func main() {
 	flag.BoolVar(&version, "version", false, "Show version")
 	var daskeys bool
 	flag.BoolVar(&daskeys, "daskeys", false, "Show supported DAS keys")
-	var errorCodes bool
-	flag.BoolVar(&errorCodes, "errorCodes", false, "Show DAS error codes")
+	var exitCodes bool
+	flag.BoolVar(&exitCodes, "exitCodes", false, "Show DAS error codes")
 	var unique bool
 	flag.BoolVar(&unique, "unique", false, "Sort results and return unique list")
 	var timeout int
@@ -99,8 +99,8 @@ func main() {
 		fmt.Println(info())
 	} else if daskeys {
 		showDASKeys()
-	} else if errorCodes {
-		showDASErrorCodes()
+	} else if exitCodes {
+		showDASExitCodes()
 	} else {
 		process(query, jsonout, sep, unique, format, host, idx, limit)
 	}
@@ -133,8 +133,8 @@ func checkDASrecords(dasrecords []mongo.DASRecord) int {
 	return 0
 }
 
-func showDASErrorCodes() {
-	fmt.Println("DAS error codes:")
+func showDASExitCodes() {
+	fmt.Println("DAS exit codes:")
 	fmt.Printf("%v %s\n", utils.DASServerError, utils.DASServerErrorName)
 	fmt.Printf("%v %s\n", utils.DBSError, utils.DBSErrorName)
 	fmt.Printf("%v %s\n", utils.PhedexError, utils.PhedexErrorName)
