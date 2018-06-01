@@ -306,9 +306,11 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		dmaps.ChangeUrl("https://cmsweb.cern.ch", host)
 		dmaps.ChangeUrl("prod/global", "int/global")
 	}
-	dasquery, err := dasql.Parse(query, "", dmaps.DASKeys())
+	dasquery, err, posLine := dasql.Parse(query, "", dmaps.DASKeys())
 	if utils.VERBOSE > 0 {
-		fmt.Println(dasquery, err)
+		fmt.Println(err)
+		fmt.Println(query)
+		fmt.Println(posLine)
 	}
 	// check dasquery and overwrite unique filter for everything except file
 	if !unique && !utils.InList("file", dasquery.Fields) && !dasquery.Detail {
