@@ -119,7 +119,24 @@ func checkDASrecords(dasrecords []mongo.DASRecord) int {
 		}
 		key := das["primary_key"].(string)
 		pkey := strings.Split(key, ".")[0]
-		for _, v := range r[pkey].([]mongo.DASRecord) {
+		rec := r[pkey]
+		var records []mongo.DASRecord
+		switch v := rec.(type) {
+		case []mongo.DASRecord:
+			records = v
+		case []interface{}:
+			for _, r := range v {
+				switch a := r.(type) {
+				case map[string]interface{}:
+					record := make(mongo.DASRecord)
+					for k, v := range a {
+						record[k] = v
+					}
+					records = append(records, record)
+				}
+			}
+		}
+		for _, v := range records {
 			e := v["error"]
 			if e != nil {
 				ecode := v["code"]
@@ -791,11 +808,13 @@ func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.D
 // helper function to process given set of URLs associted with dasquery
 func processLocalApis(dasquery dasql.DASQuery, dmaps []mongo.DASRecord, pkeys []string) []mongo.DASRecord {
 	var dasrecords []mongo.DASRecord
+	localApiMap := services.LocalAPIMap()
 	for _, dmap := range dmaps {
 		urn := dasmaps.GetString(dmap, "urn")
 		system := dasmaps.GetString(dmap, "system")
 		expire := dasmaps.GetInt(dmap, "expire")
-		api := fmt.Sprintf("L_%s_%s", system, urn)
+		api := fmt.Sprintf("%s_%s", system, urn)
+		apiFunc := localApiMap[api]
 		if utils.VERBOSE > 0 {
 			fmt.Println("DAS local API", api)
 		}
@@ -803,7 +822,7 @@ func processLocalApis(dasquery dasql.DASQuery, dmaps []mongo.DASRecord, pkeys []
 		// for details on reflection see
 		// http://stackoverflow.com/questions/12127585/go-lookup-function-by-name
 		t := reflect.ValueOf(services.LocalAPIs{})         // type of LocalAPIs struct
-		m := t.MethodByName(api)                           // associative function name for given api
+		m := t.MethodByName(apiFunc)                       // associative function name for given api
 		args := []reflect.Value{reflect.ValueOf(dasquery)} // list of function arguments
 		vals := m.Call(args)[0]                            // return value
 		records := vals.Interface().([]mongo.DASRecord)    // cast reflect value to its type
