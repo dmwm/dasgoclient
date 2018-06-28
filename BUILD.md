@@ -17,7 +17,7 @@ git push -u origin IB/CMSSW_10_2_X/gcc630
 git checkout IB/CMSSW_10_2_X/gcc630
 git fetch upstream; git rebase upstream/IB/CMSSW_10_2_X/gcc630
 git push
-git checkout -b dasgoclient-v02.00.04
+git checkout -b dasgoclient-v02.00.05
 git branch -l
 
 # change specs
@@ -28,16 +28,16 @@ cd .. # cd ~/workspace/builds
 ./build.sh dasgoclient-binary
 
 # locate RPM
-ls -al w630/RPMS/slc6_amd64_gcc630/cms+dasgoclient-binary+v02.00.04-1-1.slc6_amd64_gcc630.rpm
+ls -al w630/RPMS/slc6_amd64_gcc630/cms+dasgoclient-binary+v02.00.05-1-1.slc6_amd64_gcc630.rpm
 
 # copy RPM to EOS area
-cp w630/RPMS/slc6_amd64_gcc630/cms+dasgoclient-binary+v02.00.04-1-1.slc6_amd64_gcc630.rpm /eos/user/v/valya/www/dasgoclient/
+cp w630/RPMS/slc6_amd64_gcc630/cms+dasgoclient-binary+v02.00.05-1-1.slc6_amd64_gcc630.rpm /eos/user/v/valya/www/dasgoclient/
 
 # now we can build dasgoclient wrapper since it look-up dasgoclient RPMs
 ./build.sh dasgoclient
 
 # test new client
-cp w630/slc6_amd64_gcc630/cms/dasgoclient-binary/v02.00.04/bin/dasgoclient_linux ./dasgoclient
+cp w630/slc6_amd64_gcc630/cms/dasgoclient-binary/v02.00.05/bin/dasgoclient_linux ./dasgoclient
 voms-proxy-init -voms cms -rfc
 ./dasgoclient -help
 
@@ -46,7 +46,7 @@ cd cmsdist
 git commit -m "New dasgoclient version" dasgoclient*.spec
 
 # push changes
-git push -u origin dasgoclient-v02.00.04
+git push -u origin dasgoclient-v02.00.05
 
 # finally make pull request
 
