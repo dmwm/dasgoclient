@@ -653,6 +653,9 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 			}
 		case []interface{}:
 			for _, r := range rrr {
+				if r == nil {
+					continue
+				}
 				v := r.(map[string]interface{})
 				recErr := v["error"]
 				if recErr != nil {
