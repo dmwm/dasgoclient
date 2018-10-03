@@ -107,15 +107,15 @@ func main() {
 }
 
 // helper function to check DAS records and return first error code, otherwise 0
-func checkDASrecords(dasrecords []mongo.DASRecord) int {
+func checkDASrecords(dasrecords []mongo.DASRecord) (int, string) {
 	for _, r := range dasrecords {
 		das := r["das"].(mongo.DASRecord)
 		if das["error"] != nil {
 			ecode := das["code"]
 			if ecode != nil {
-				return ecode.(int)
+				return ecode.(int), das["error"].(string)
 			}
-			return utils.DASServerError
+			return utils.DASServerError, utils.DASServerErrorName
 		}
 		key := das["primary_key"].(string)
 		pkey := strings.Split(key, ".")[0]
@@ -141,13 +141,13 @@ func checkDASrecords(dasrecords []mongo.DASRecord) int {
 			if e != nil {
 				ecode := v["code"]
 				if ecode != nil {
-					return ecode.(int)
+					return ecode.(int), e.(string)
 				}
-				return utils.DASServerError
+				return utils.DASServerError, utils.DASServerErrorName
 			}
 		}
 	}
-	return 0
+	return 0, ""
 }
 
 func showDASExitCodes() {
@@ -479,13 +479,13 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		}
 	}
 
-	ecode := checkDASrecords(dasrecords)
+	ecode, dasError := checkDASrecords(dasrecords)
 
 	// if user provides format option we'll add extra fields to be compatible with das_client
 	if strings.ToLower(format) == "json" {
 		ctime := time.Now().Unix() - time0
 		// add status wrapper to be compatible with das_client.py
-		fmt.Printf("{\"status\":\"ok\", \"mongo_query\":%s, \"nresults\":%d, \"timestamp\":%d, \"ctime\":%d, \"data\":", dasquery.Marshall(), len(dasrecords), time.Now().Unix(), ctime)
+		fmt.Printf("{\"status\":\"ok\", \"ecode\":\"%s\", \"mongo_query\":%s, \"nresults\":%d, \"timestamp\":%d, \"ctime\":%d, \"data\":", dasError, dasquery.Marshall(), len(dasrecords), time.Now().Unix(), ctime)
 	}
 
 	// if we use detail=True option in json format we'll dump entire dasrecords
