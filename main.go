@@ -396,7 +396,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 			} else {
 				furl = fmt.Sprintf("%s/api/GLOBAL/runsummary/json/%s/none/data", furl, columns)
 			}
-		} else if system == "reqmgr" || system == "mcm" {
+		} else if system == "reqmgr" || system == "mcm" || system == "rucio" {
 			furl = das.FormRESTUrl(dasquery, dmap)
 		} else {
 			furl = das.FormUrlCall(dasquery, dmap)
