@@ -398,6 +398,14 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 			}
 		} else if system == "reqmgr" || system == "mcm" || system == "rucio" {
 			furl = das.FormRESTUrl(dasquery, dmap)
+			if system == "rucio" {
+				urn, _ := dmap["urn"].(string)
+				if urn == "rses" {
+					// cut off site parameter from REST URL since no site condition is supported yet
+					arr := strings.Split(furl, "/rses/")
+					furl = fmt.Sprintf("%s/rses/", arr[0])
+				}
+			}
 		} else {
 			furl = das.FormUrlCall(dasquery, dmap)
 		}
