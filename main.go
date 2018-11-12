@@ -225,7 +225,7 @@ func showExamples() {
 // global keymap for DAS keys and associate CMS data-service
 func DASKeyMap() map[string][]string {
 	keyMap := map[string][]string{
-		"site":    []string{"dbs phedex combined"},
+		"site":    []string{"dbs", "phedex", "combined"},
 		"dataset": []string{"dbs3"},
 		"block":   []string{"dbs3"},
 		"file":    []string{"dbs3"},
@@ -302,7 +302,7 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 	if dasquery.System == "" {
 		for _, key := range dasquery.Fields {
 			srvs := keyMap[key]
-			if !utils.InList(system, srvs) {
+			if !utils.FindInList(system, srvs) {
 				return true
 			}
 		}
