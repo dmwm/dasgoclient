@@ -93,6 +93,14 @@ func main() {
 	utils.TIMEOUT = timeout
 	utils.CLIENT_VERSION = "{{VERSION}}"
 	checkX509()
+	if verbose > 0 {
+		fmt.Println("DBSUrl: ", services.DBSUrl("prod"))
+		fmt.Println("PhedexUrl: ", services.PhedexUrl())
+		fmt.Println("SitedbUrl: ", services.SitedbUrl())
+		fmt.Println("CricUrl w/ site API: ", services.CricUrl("site"))
+		fmt.Println("RucioUrl w/ replicas API: ", services.RucioUrl("replicas"))
+		fmt.Println("RucioAuthUrl: ", utils.RucioAuth.Url())
+	}
 	if examples {
 		showExamples()
 	} else if version {
