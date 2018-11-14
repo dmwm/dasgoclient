@@ -110,6 +110,10 @@ func main() {
 	} else if exitCodes {
 		showDASExitCodes()
 	} else {
+		if strings.Contains(query, "|") && !strings.Contains(query, "detail") {
+			// for filters and aggregators we need to use detail=true flag
+			query = strings.Replace(query, "|", " detail=true |", 1)
+		}
 		process(query, jsonout, sep, unique, format, host, idx, limit)
 	}
 }
@@ -497,6 +501,19 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 
 	ecode, dasError := checkDASrecords(dasrecords)
 
+	// apply aggregation
+	aggrs := dasquery.Aggregators
+	var out []mongo.DASRecord
+	if len(aggrs) > 0 {
+		for _, agg := range aggrs {
+			fagg := agg[0]
+			fval := agg[1]
+			rec := das.Aggregate(dasrecords, fagg, fval)
+			out = append(out, rec)
+		}
+		dasrecords = out
+	}
+
 	// if user provides format option we'll add extra fields to be compatible with das_client
 	if strings.ToLower(format) == "json" {
 		ctime := time.Now().Unix() - time0
@@ -543,6 +560,12 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 			records = getRecords(dasrecords, selectKeys, selectSubKeys, sep, jsonout)
 		} else {
 			records = getFilteredRecords(dasquery, dasrecords, sep)
+		}
+	} else if len(dasquery.Aggregators) > 0 {
+		if strings.ToLower(format) == "json" {
+			records = getRecords(dasrecords, selectKeys, selectSubKeys, sep, jsonout)
+		} else {
+			records = getAggregatedRecords(dasquery, dasrecords, sep)
 		}
 	} else {
 		records = getRecords(dasrecords, selectKeys, selectSubKeys, sep, jsonout)
@@ -619,6 +642,34 @@ func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, s
 			if len(out) > 0 {
 				records = append(records, strings.Join(out, sep))
 			}
+		}
+	}
+	return records
+}
+
+// helper function to extract aggregated fields from DAS records
+func getAggregatedRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, sep string) []string {
+	var records []string
+	for _, rec := range dasrecords {
+		var out []string
+		for _, agg := range dasquery.Aggregators {
+			fagg := agg[0]
+			if fagg != rec["function"] {
+				continue
+			}
+			fval := agg[1]
+			var aval string
+			switch res := rec["result"].(type) {
+			case map[string]interface{}:
+				aval = fmt.Sprintf("%v", res["value"])
+			case mongo.DASRecord:
+				aval = fmt.Sprintf("%v", res["value"])
+			}
+			sval := fmt.Sprintf("%s(%s): %v", fagg, fval, aval)
+			out = append(out, sval)
+		}
+		if len(out) > 0 {
+			records = append(records, strings.Join(out, sep))
 		}
 	}
 	return records
