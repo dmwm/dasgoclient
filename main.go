@@ -46,6 +46,8 @@ func main() {
 	flag.StringVar(&sep, "sep", " ", "Separator to use")
 	var dasmaps string
 	flag.StringVar(&dasmaps, "dasmaps", "", "Specify location of dasmaps")
+	var aggregate bool
+	flag.BoolVar(&aggregate, "aggregate", false, "aggregate results across all data-services")
 	var verbose int
 	flag.IntVar(&verbose, "verbose", 0, "Verbose level, support 0,1,2")
 	var examples bool
@@ -114,7 +116,7 @@ func main() {
 			// for filters and aggregators we need to use detail=true flag
 			query = strings.Replace(query, "|", " detail=true |", 1)
 		}
-		process(query, jsonout, sep, unique, format, host, idx, limit)
+		process(query, jsonout, sep, unique, format, host, idx, limit, aggregate)
 	}
 }
 
@@ -240,7 +242,7 @@ func DASKeyMap() map[string][]string {
 		"site":    []string{"dbs", "phedex", "combined"},
 		"dataset": []string{"dbs3"},
 		"block":   []string{"dbs3"},
-		"file":    []string{"dbs3"},
+		"file":    []string{"dbs3", "phedex"},
 		"run":     []string{"runregistry", "dbs3"},
 		"config":  []string{"reqmgr2"},
 	}
@@ -327,7 +329,7 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 }
 
 // Process function process' given query and return back results
-func process(query string, jsonout bool, sep string, unique bool, format, host string, rdx, limit int) {
+func process(query string, jsonout bool, sep string, unique bool, format, host string, rdx, limit int, aggregate bool) {
 	time0 := time.Now().Unix()
 	if strings.ToLower(format) == "json" {
 		jsonout = true
@@ -376,9 +378,18 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		selectedServices = append(selectedServices, system)
 	}
 	// if nothing is selected use original from the map
-	if len(selectedServices) == 0 {
+	if len(selectedServices) == 0 || aggregate {
 		selectedServices = mapServices
 	}
+
+	// if we're not aggregating results
+	// use only primary data-service for all requests except site queries
+	if !aggregate {
+		if len(dasquery.Fields) == 1 && dasquery.Fields[0] != "site" {
+			selectedServices = []string{selectedServices[0]}
+		}
+	}
+
 	// loop over services and fetch data
 	for _, dmap := range maps {
 		args := ""
