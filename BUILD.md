@@ -51,6 +51,6 @@ git push -u origin dasgoclient-v02.01.01
 # finally make pull request
 
 # delete local branch (named newfeature)
-git branch -d newfeature
+git branch -d dasgoclient-v02.01.01
 # delete remote branch (named newfeature)
-git push origin :newfeature
+git push origin :dasgoclient-v02.01.01
