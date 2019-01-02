@@ -483,7 +483,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	}
 
 	// perform post-processing of DAS records
-	dasrecords = das.PostProcessing(dasquery, dasrecords)
+	//     dasrecords = das.PostProcessing(dasquery, dasrecords)
 
 	// check if site query returns nothing and then look-up data in DBS3
 	if len(dasrecords) == 0 && utils.InList("site", dasquery.Fields) {
