@@ -356,10 +356,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 
 	// find out list of APIs/CMS services which can process this query request
 	maps := dmaps.FindServices(dasquery)
-	var srvs, pkeys, mapServices []string
-	urls := make(map[string]string)
-	var localApis []mongo.DASRecord
-	var furl string
+	var mapServices []string
 	for _, dmap := range maps {
 		if v, ok := dmap["system"]; ok {
 			srv := v.(string)
@@ -390,75 +387,9 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		}
 	}
 
-	// loop over services and fetch data
-	for _, dmap := range maps {
-		args := ""
-		system, _ := dmap["system"].(string)
-		if !utils.InList(system, selectedServices) {
-			continue
-		}
-		if system == "runregistry" {
-			switch v := dasquery.Spec["run"].(type) {
-			case string:
-				args = fmt.Sprintf("{\"filter\": {\"number\": \">= %s and <= %s\"}}", v, v)
-			case []string:
-				cond := fmt.Sprintf("= %s", v[0])
-				for i, vvv := range v {
-					if i > 0 {
-						cond = fmt.Sprintf("%s or = %s", cond, vvv)
-					}
-				}
-				args = fmt.Sprintf("{\"filter\": {\"number\": \"%s\"}}", cond)
-				//                 args = fmt.Sprintf("{\"filter\": {\"number\": \">= %s and <= %s\"}}", v[0], v[len(v)-1])
-			}
-			furl, _ = dmap["url"].(string)
-			// Adjust url to use custom columns
-			columns := "number%2CstartTime%2CstopTime%2Ctriggers%2CrunClassName%2CrunStopReason%2Cbfield%2CgtKey%2Cl1Menu%2ChltKeyDescription%2ClhcFill%2ClhcEnergy%2CrunCreated%2Cmodified%2ClsCount%2ClsRanges"
-			if furl[len(furl)-1:] == "/" { // look-up last slash
-				furl = fmt.Sprintf("%sapi/GLOBAL/runsummary/json/%s/none/data", furl, columns)
-			} else {
-				furl = fmt.Sprintf("%s/api/GLOBAL/runsummary/json/%s/none/data", furl, columns)
-			}
-		} else if system == "reqmgr" || system == "mcm" || system == "rucio" {
-			furl = das.FormRESTUrl(dasquery, dmap)
-			if system == "rucio" {
-				urn, _ := dmap["urn"].(string)
-				if urn == "rses" {
-					// cut off site parameter from REST URL since no site condition is supported yet
-					arr := strings.Split(furl, "/rses/")
-					furl = fmt.Sprintf("%s/rses/", arr[0])
-				}
-			}
-		} else {
-			furl = das.FormUrlCall(dasquery, dmap)
-		}
-		if furl == "local_api" && !dasmaps.MapInList(dmap, localApis) {
-			localApis = append(localApis, dmap)
-		} else if furl != "" {
-			// adjust conddb URL, remove Runs= empty parater since it leads to an error
-			if strings.Contains(furl, "Runs=&") {
-				furl = strings.Replace(furl, "Runs=&", "", -1)
-			}
-			if _, ok := urls[furl]; !ok {
-				urls[furl] = args
-			}
-		}
+	// get list of services, pkeys, urls and localApis we need to process
+	srvs, pkeys, urls, localApis := das.ProcessLogic(dasquery, maps, selectedServices)
 
-		srv := fmt.Sprintf("%s:%s", dmap["system"], dmap["urn"])
-		srvs = append(srvs, srv)
-		lkeys := strings.Split(dmap["lookup"].(string), ",")
-		for _, pkey := range lkeys {
-			for _, item := range dmap["das_map"].([]interface{}) {
-				rec := mongo.Convert2DASRecord(item)
-				daskey := rec["das_key"].(string)
-				reckey := rec["rec_key"].(string)
-				if daskey == pkey {
-					pkeys = append(pkeys, reckey)
-					break
-				}
-			}
-		}
-	}
 	if utils.VERBOSE > 0 {
 		fmt.Println("### selected services", srvs, pkeys)
 		fmt.Println("### selected urls", urls)
@@ -493,6 +424,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		dasquery.System = "dbs3"
 		selectedServices = []string{"dbs3"}
 		args := ""
+		furl := ""
 		for _, dmap := range maps {
 			system, _ := dmap["system"].(string)
 			if !utils.InList(system, selectedServices) {
