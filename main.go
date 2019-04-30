@@ -403,10 +403,16 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		for _, r := range processURLs(dasquery, urls, maps, &dmaps, pkeys) {
 			dasrecords = append(dasrecords, r)
 		}
+		if utils.VERBOSE > 0 {
+			fmt.Println("#### processURLs", len(dasrecords))
+		}
 	}
 	if len(localApis) > 0 {
 		for _, r := range processLocalApis(dasquery, localApis, pkeys) {
 			dasrecords = append(dasrecords, r)
+		}
+		if utils.VERBOSE > 0 {
+			fmt.Println("#### processLocalApis", len(dasrecords))
 		}
 	}
 	if utils.VERBOSE > 0 {
