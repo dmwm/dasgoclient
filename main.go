@@ -489,13 +489,16 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 					fmt.Println(string(out))
 				}
 			} else {
-				fmt.Println("DAS record", rec, "fail to mashal it to JSON stream")
+				fmt.Println("ERROR: DAS record", rec, "fail to marshal it to JSON stream")
 				os.Exit(utils.DASServerError)
 			}
 		}
 		fmt.Println("]") // end of data output
 		if strings.ToLower(format) == "json" {
 			fmt.Println("}") // end of status wrapper
+		}
+		if ecode != 0 {
+			fmt.Println("ERROR: das exit with code:", ecode, ", error:", dasError)
 		}
 		os.Exit(ecode)
 	}
@@ -553,6 +556,9 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 
 	if strings.ToLower(format) == "json" {
 		fmt.Printf("}")
+	}
+	if ecode != 0 {
+		fmt.Println("ERROR: das exit with code:", ecode, ", error:", dasError)
 	}
 	os.Exit(ecode)
 }
@@ -648,7 +654,7 @@ func selectedKeys(dasquery dasql.DASQuery, pkeys []string) ([][]string, [][]stri
 		selectSubKeys = append(selectSubKeys, keys) // hold  [key [0] attribute]
 	}
 	if len(selectKeys) == 0 {
-		fmt.Println("Unable to parse DAS query, no select keys are found", dasquery)
+		fmt.Println("ERROR: Unable to parse DAS query, no select keys are found", dasquery)
 		os.Exit(utils.DASQueryError)
 	}
 	return selectKeys, selectSubKeys
