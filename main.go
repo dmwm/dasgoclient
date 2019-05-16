@@ -182,6 +182,8 @@ func showDASExitCodes() {
 	fmt.Printf("%v %s\n", utils.MongoDBError, utils.MongoDBErrorName)
 	fmt.Printf("%v %s\n", utils.DASProxyError, utils.DASProxyErrorName)
 	fmt.Printf("%v %s\n", utils.DASQueryError, utils.DASQueryErrorName)
+	fmt.Printf("%v %s\n", utils.DASParserError, utils.DASParserErrorName)
+	fmt.Printf("%v %s\n", utils.DASValidationError, utils.DASValidationErrorName)
 }
 
 func info() string {
@@ -346,6 +348,15 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		fmt.Println(query)
 		fmt.Println(posLine)
 	}
+	if err != "" {
+		fmt.Println("ERROR: das parser error:", err)
+		os.Exit(utils.DASParserError)
+	}
+	if e := dasql.ValidateDASQuerySpecs(dasquery); e != nil {
+		fmt.Println(e)
+		os.Exit(utils.DASValidationError)
+	}
+
 	// check dasquery and overwrite unique filter for everything except file
 	if !unique && !utils.InList("file", dasquery.Fields) && !dasquery.Detail {
 		unique = true
