@@ -1,5 +1,7 @@
 # login to lxplus
 cd workspace/builds
+# login on vocms0181
+cd /wma/vk/das_builds
 export SCRAM_ARCH=slc7_amd64_gcc700
 cd cmsdist
 # either create new git branch
@@ -32,6 +34,9 @@ ls -al w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.03-1-1.slc6_amd
 
 # copy RPM to EOS area
 cp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.03-1-1.slc6_amd64_gcc700.rpm /eos/user/v/valya/www/dasgoclient/
+# copy RPM on vocms0181
+scp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.03-1-1.slc6_amd64_gcc700.rpm valya@lxplus.cern.ch:/eos/user/v/valya/www/dasgoclient/
+
 
 # now we can build dasgoclient wrapper since it look-up dasgoclient RPMs
 ./build.sh dasgoclient
