@@ -468,8 +468,10 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 		for _, agg := range aggrs {
 			fagg := agg[0]
 			fval := agg[1]
-			rec := das.Aggregate(dasrecords, fagg, fval)
-			out = append(out, rec)
+			if len(dasrecords) > 0 {
+				rec := das.Aggregate(dasrecords, fagg, fval)
+				out = append(out, rec)
+			}
 		}
 		dasrecords = out
 	}
