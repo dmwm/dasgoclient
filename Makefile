@@ -1,5 +1,5 @@
-GOPATH:=$(PWD):${GOPATH}
-export GOPATH
+#GOPATH:=$(PWD):${GOPATH}
+#export GOPATH
 OS := $(shell uname)
 ifeq ($(OS),Darwin)
 flags=-ldflags="-s -w"
