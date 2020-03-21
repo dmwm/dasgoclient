@@ -64,6 +64,8 @@ func main() {
 	flag.IntVar(&timeout, "timeout", 0, "Timeout for url call")
 	var urlRetry int
 	flag.IntVar(&urlRetry, "urlRetry", 3, "urlRetry for url call")
+	var funcProfile string
+	flag.StringVar(&funcProfile, "funcProfile", "", "Specify location of function profile file")
 	flag.Usage = func() {
 		fmt.Println("Usage: dasgoclient [options]")
 		flag.PrintDefaults()
@@ -94,6 +96,9 @@ func main() {
 	utils.WEBSERVER = 0
 	utils.TIMEOUT = timeout
 	utils.CLIENT_VERSION = "{{VERSION}}"
+	if funcProfile != "" {
+		utils.InitFunctionProfiler(funcProfile)
+	}
 	checkX509()
 	if verbose > 0 {
 		fmt.Println("DBSUrl: ", services.DBSUrl("prod"))
@@ -332,6 +337,10 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 
 // Process function process' given query and return back results
 func process(query string, jsonout bool, sep string, unique bool, format, host string, rdx, limit int, aggregate bool) {
+
+	// defer function profiler
+	defer utils.MeasureTime("dasgoclient/process")
+
 	time0 := time.Now().Unix()
 	if strings.ToLower(format) == "json" {
 		jsonout = true
@@ -578,6 +587,10 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 
 // helper function to extract filtered fields from DAS records
 func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, sep string) []string {
+
+	// defer function profiler
+	defer utils.MeasureTime("dasgoclient/getFilteredRecords")
+
 	var records []string
 	if dasfilters, ok := dasquery.Filters["grep"]; ok {
 		var filterEntries [][]string
@@ -596,11 +609,11 @@ func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, s
 			for _, filters := range filterEntries {
 				rbytes, err := mongo.GetBytesFromDASRecord(rec)
 				if err != nil {
-					fmt.Errorf("Fail to parse DAS record=%v, error=%v\n", rec, err)
+					fmt.Printf("Fail to parse DAS record=%v, error=%v\n", rec, err)
 				} else {
 					val, _, _, err := jsonparser.Get(rbytes, filters...)
 					if err != nil {
-						fmt.Errorf("Unable to extract filters=%v, error=%v\n", filters, err)
+						fmt.Printf("Unable to extract filters=%v, error=%v\n", filters, err)
 					} else {
 						out = append(out, string(val))
 					}
@@ -617,6 +630,10 @@ func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, s
 
 // helper function to extract aggregated fields from DAS records
 func getAggregatedRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, sep string) []string {
+
+	// defer function profiler
+	defer utils.MeasureTime("dasgoclient/getAggregatedRecords")
+
 	var records []string
 	for _, rec := range dasrecords {
 		var out []string
@@ -675,6 +692,10 @@ func selectedKeys(dasquery dasql.DASQuery, pkeys []string) ([][]string, [][]stri
 
 // helper function to print DAS records on stdout
 func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]string, sep string, jsonout bool) []string {
+
+	// defer function profiler
+	defer utils.MeasureTime("dasgoclient/getRecords")
+
 	var records []string
 	for _, rec := range dasrecords {
 		das := rec["das"].(mongo.DASRecord)
@@ -712,12 +733,12 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 		}
 		rbytes, err := mongo.GetBytesFromDASRecord(rec)
 		if err != nil {
-			fmt.Errorf("Fail to parse DAS record=%v, selKeys=%v, error=%v\n", rec, selectKeys, err)
+			fmt.Printf("Fail to parse DAS record=%v, selKeys=%v, error=%v\n", rec, selectKeys, err)
 		} else {
 			if jsonout {
 				out, err := json.Marshal(rec)
 				if err != nil {
-					fmt.Errorf("Fail to marshal DAS record=%v, error=%v\n", rec, err)
+					fmt.Printf("Fail to marshal DAS record=%v, error=%v\n", rec, err)
 				}
 				records = append(records, string(out))
 				continue
@@ -731,7 +752,7 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 						out = append(out, sval)
 					}
 				} else {
-					fmt.Errorf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
+					fmt.Printf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
 				}
 			}
 			if len(out) > 0 {
@@ -745,7 +766,7 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 							out = append(out, sval)
 						}
 					} else {
-						fmt.Errorf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
+						fmt.Printf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
 					}
 				}
 				if len(out) > 0 {
@@ -759,6 +780,10 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 
 // helper function to get DAS records out of url response
 func response2Records(r *utils.ResponseType, dasquery dasql.DASQuery, maps []mongo.DASRecord, dmaps *dasmaps.DASMaps, pkeys []string) []mongo.DASRecord {
+
+	// defer function profiler
+	defer utils.MeasureTime("dasgoclient/response2Records")
+
 	var dasrecords []mongo.DASRecord
 	system := ""
 	expire := 0
@@ -796,6 +821,10 @@ func response2Records(r *utils.ResponseType, dasquery dasql.DASQuery, maps []mon
 
 // helper function to process given set of URLs associted with dasquery
 func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.DASRecord, dmaps *dasmaps.DASMaps, pkeys []string) []mongo.DASRecord {
+
+	// defer function profiler
+	defer utils.MeasureTime("dasgoclient/processURLs")
+
 	// defer function will propagate panic message to higher level
 	//     defer utils.ErrPropagate("processUrls")
 
@@ -851,6 +880,10 @@ func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.D
 
 // helper function to process given set of URLs associted with dasquery
 func processLocalApis(dasquery dasql.DASQuery, dmaps []mongo.DASRecord, pkeys []string) []mongo.DASRecord {
+
+	// defer function profiler
+	defer utils.MeasureTime("dasgoclient/processLocalApis")
+
 	var dasrecords []mongo.DASRecord
 	localApiMap := services.LocalAPIMap()
 	for _, dmap := range dmaps {
