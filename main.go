@@ -752,7 +752,9 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 						out = append(out, sval)
 					}
 				} else {
-					fmt.Printf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
+					if utils.VERBOSE > 0 {
+						fmt.Printf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
+					}
 				}
 			}
 			if len(out) > 0 {
