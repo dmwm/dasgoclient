@@ -19,7 +19,7 @@ git push -u origin IB/CMSSW_11_0_X/gcc700
 git checkout IB/CMSSW_11_0_X/gcc700
 git fetch upstream; git rebase upstream/IB/CMSSW_11_0_X/gcc700
 git push
-git checkout -b dasgoclient-v02.02.03
+git checkout -b dasgoclient-v02.02.05
 git branch -l
 
 # change specs
@@ -30,19 +30,19 @@ cd .. # cd ~/workspace/builds
 ./build.sh dasgoclient-binary
 
 # locate RPM
-ls -al w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.03-1-1.slc6_amd64_gcc700.rpm
+ls -al w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.05-1-1.slc6_amd64_gcc700.rpm
 
 # copy RPM to EOS area
-cp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.03-1-1.slc6_amd64_gcc700.rpm /eos/user/v/valya/www/dasgoclient/
+cp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.05-1-1.slc6_amd64_gcc700.rpm /eos/user/v/valya/www/dasgoclient/
 # copy RPM on vocms0181
-scp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.03-1-1.slc6_amd64_gcc700.rpm valya@lxplus.cern.ch:/eos/user/v/valya/www/dasgoclient/
+scp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.05-1-1.slc6_amd64_gcc700.rpm valya@lxplus.cern.ch:/eos/user/v/valya/www/dasgoclient/
 
 
 # now we can build dasgoclient wrapper since it look-up dasgoclient RPMs
 ./build.sh dasgoclient
 
 # test new client
-cp w700/slc6_amd64_gcc700/cms/dasgoclient-binary/v02.02.03/bin/dasgoclient_linux ./dasgoclient
+cp w700/slc6_amd64_gcc700/cms/dasgoclient-binary/v02.02.05/bin/dasgoclient_linux ./dasgoclient
 voms-proxy-init -voms cms -rfc
 ./dasgoclient -help
 
@@ -51,11 +51,11 @@ cd cmsdist
 git commit -m "New dasgoclient version" dasgoclient*.spec
 
 # push changes
-git push -u origin dasgoclient-v02.02.03
+git push -u origin dasgoclient-v02.02.05
 
 # finally make pull request
 
 # delete local branch (named newfeature)
-git branch -d dasgoclient-v02.02.03
+git branch -d dasgoclient-v02.02.05
 # delete remote branch (named newfeature)
-git push origin :dasgoclient-v02.02.03
+git push origin :dasgoclient-v02.02.05
