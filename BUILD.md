@@ -31,11 +31,14 @@ cd .. # cd ~/workspace/builds
 
 # locate RPM
 ls -al w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.06-1-1.slc6_amd64_gcc700.rpm
+ls -al w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.02.06-1-1.slc7_amd64_gcc820.rpm
 
 # copy RPM to EOS area
 cp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.06-1-1.slc6_amd64_gcc700.rpm /eos/user/v/valya/www/dasgoclient/
+cp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.02.06-1-1.slc7_amd64_gcc820.rpm /eos/user/v/valya/www/dasgoclient/
 # copy RPM on vocms0181
 scp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.06-1-1.slc6_amd64_gcc700.rpm valya@lxplus.cern.ch:/eos/user/v/valya/www/dasgoclient/
+scp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.02.06-1-1.slc7_amd64_gcc820.rpm valya@lxplus.cern.ch:/eos/user/v/valya/www/dasgoclient/
 
 
 # now we can build dasgoclient wrapper since it look-up dasgoclient RPMs
@@ -43,6 +46,7 @@ scp w700/RPMS/slc6_amd64_gcc700/cms+dasgoclient-binary+v02.02.06-1-1.slc6_amd64_
 
 # test new client
 cp w700/slc6_amd64_gcc700/cms/dasgoclient-binary/v02.02.06/bin/dasgoclient_linux ./dasgoclient
+cp w820/slc7_amd64_gcc820/cms/dasgoclient-binary/v02.02.06/bin/dasgoclient_linux ./dasgoclient
 voms-proxy-init -voms cms -rfc
 ./dasgoclient -help
 
