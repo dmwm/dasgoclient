@@ -105,7 +105,7 @@ func main() {
 		fmt.Println("PhedexUrl: ", services.PhedexUrl())
 		fmt.Println("SitedbUrl: ", services.SitedbUrl())
 		fmt.Println("CricUrl w/ site API: ", services.CricUrl("site"))
-		fmt.Println("RucioUrl w/ replicas API: ", services.RucioUrl("replicas"))
+		fmt.Println("RucioUrl: ", services.RucioUrl())
 		fmt.Println("RucioAuthUrl: ", utils.RucioAuth.Url())
 	}
 	if examples {
