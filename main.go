@@ -609,7 +609,7 @@ func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, s
 			for _, filters := range filterEntries {
 				rbytes, err := mongo.GetBytesFromDASRecord(rec)
 				if err != nil {
-					fmt.Printf("Fail to parse DAS record=%v, error=%v\n", rec, err)
+					fmt.Printf("Fail to parse DAS record=%+v, error=%v\n", rec, err)
 				} else {
 					val, _, _, err := jsonparser.Get(rbytes, filters...)
 					if err != nil {
@@ -733,7 +733,7 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 		}
 		rbytes, err := mongo.GetBytesFromDASRecord(rec)
 		if err != nil {
-			fmt.Printf("Fail to parse DAS record=%v, selKeys=%v, error=%v\n", rec, selectKeys, err)
+			fmt.Printf("Fail to parse DAS record=%v, selKeys=%+v, error=%v\n", rec, selectKeys, err)
 		} else {
 			if jsonout {
 				out, err := json.Marshal(rec)
@@ -753,7 +753,7 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 					}
 				} else {
 					if utils.VERBOSE > 0 {
-						fmt.Printf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
+						fmt.Printf("Fail to parse DAS record=%+v, keys=%v, error=%v\n", rec, keys, err)
 					}
 				}
 			}
@@ -768,7 +768,7 @@ func getRecords(dasrecords []mongo.DASRecord, selectKeys, selectSubKeys [][]stri
 							out = append(out, sval)
 						}
 					} else {
-						fmt.Printf("Fail to parse DAS record=%v, keys=%v, error=%v\n", rec, keys, err)
+						fmt.Printf("Fail to parse DAS record=%+v, keys=%v, error=%v\n", rec, keys, err)
 					}
 				}
 				if len(out) > 0 {
