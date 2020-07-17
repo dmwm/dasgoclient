@@ -96,6 +96,7 @@ func main() {
 	utils.WEBSERVER = 0
 	utils.TIMEOUT = timeout
 	utils.CLIENT_VERSION = "{{VERSION}}"
+	utils.TLSCertsRenewInterval = 600 * time.Second
 	if funcProfile != "" {
 		utils.InitFunctionProfiler(funcProfile)
 	}
@@ -446,6 +447,9 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	if len(dasrecords) == 0 && utils.InList("site", dasquery.Fields) {
 		if !jsonout {
 			fmt.Println("WARNING: No site records found in PhEDEx, will look-up original sites in DBS")
+		}
+		if utils.VERBOSE > 0 {
+			fmt.Println("### site query returns nothing, will look-up data in DBS")
 		}
 		dasquery.System = "dbs3"
 		selectedServices = []string{"dbs3"}
