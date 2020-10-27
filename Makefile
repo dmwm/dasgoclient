@@ -53,4 +53,4 @@ clean:
 test : test1
 
 test1:
-	go test -exe=$(PWD)/dasgoclient -timeout 20m
+	go test

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,26 +10,21 @@ import (
 	"strings"
 	"testing"
 
+	_ "testing"
+
 	"github.com/dmwm/das2go/mongo"
 	"github.com/dmwm/das2go/utils"
 	"github.com/stretchr/testify/assert"
 )
 
-var exe string
-
-func init() {
-	flag.StringVar(&exe, "exe", "", "dasgoclient executable to run")
-	flag.Parse()
-	if exe == "" {
-		panic("Unable to find dasgoclient executable, please provide as -exe=/path/dasgoclient")
-	}
-}
-
 // helper function to perform DAS query and capture its output
 func runCommand(query string) ([]byte, error) {
-	//     path := "/Users/vk/Work/Languages/Go/gopath/src/github.com/dmwm/dasgoclient"
-	//     cmd := fmt.Sprintf("%s/dasgoclient", path)
-	out, err := exec.Command(exe, "-query", query, "-format", "json").Output()
+	path, err := os.Getwd()
+	if err != nil {
+		return []byte{}, err
+	}
+	cmd := fmt.Sprintf("%s/dasgoclient", path)
+	out, err := exec.Command(cmd, "-query", query, "-format", "json").Output()
 	return out, err
 }
 
