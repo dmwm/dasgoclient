@@ -74,8 +74,8 @@ func main() {
 		fmt.Println("\tdasgoclient -query=\"dataset=/ZMM*/*/*\"")
 		fmt.Println("\t# get results in JSON data-format")
 		fmt.Println("\tdasgoclient -query=\"dataset=/ZMM*/*/*\" -json")
-		fmt.Println("\t# get results from specific CMS data-service, e.g. phedex")
-		fmt.Println("\tdasgoclient -query=\"file dataset=/ZMM/Summer11-DESIGN42_V11_428_SLHC1-v1/GEN-SIM system=phedex\" -json")
+		fmt.Println("\t# get results from specific CMS data-service, e.g. rucio")
+		fmt.Println("\tdasgoclient -query=\"file dataset=/ZMM/Summer11-DESIGN42_V11_428_SLHC1-v1/GEN-SIM system=rucio\" -json")
 	}
 	mode := flag.String("profileMode", "", "enable profiling mode, one of [cpu, mem, block]")
 	flag.Parse()
@@ -103,7 +103,6 @@ func main() {
 	checkX509()
 	if verbose > 0 {
 		fmt.Println("DBSUrl: ", services.DBSUrl("prod"))
-		fmt.Println("PhedexUrl: ", services.PhedexUrl())
 		fmt.Println("SitedbUrl: ", services.SitedbUrl())
 		fmt.Println("CricUrl w/ site API: ", services.CricUrl("site"))
 		fmt.Println("RucioUrl: ", services.RucioUrl())
@@ -247,10 +246,10 @@ func showExamples() {
 // global keymap for DAS keys and associate CMS data-service
 func DASKeyMap() map[string][]string {
 	keyMap := map[string][]string{
-		"site":    []string{"dbs", "phedex", "combined", "rucio"},
+		"site":    []string{"dbs", "combined", "rucio"},
 		"dataset": []string{"dbs3"},
 		"block":   []string{"dbs3"},
-		"file":    []string{"dbs3", "phedex"},
+		"file":    []string{"dbs3"},
 		"run":     []string{"runregistry", "dbs3"},
 		"config":  []string{"reqmgr2"},
 	}
@@ -446,7 +445,7 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	// check if site query returns nothing and then look-up data in DBS3
 	if len(dasrecords) == 0 && utils.InList("site", dasquery.Fields) {
 		if !jsonout {
-			fmt.Println("WARNING: No site records found in PhEDEx, will look-up original sites in DBS")
+			fmt.Println("WARNING: No site records found in Rucio, will look-up original sites in DBS")
 		}
 		if utils.VERBOSE > 0 {
 			fmt.Println("### site query returns nothing, will look-up data in DBS")

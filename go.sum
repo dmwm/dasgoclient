@@ -6,8 +6,8 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dmwm/cmsauth v0.0.0-20161228211028-e9fca92e3335/go.mod h1:HkpKlZi42a4Jg5oy2U+EnglbhShNo3yHJZGEX6CvgmY=
-github.com/dmwm/das2go v0.0.0-20200715170806-2590bfd90f67 h1:Kh4jOLIjF5bHuEDsNkFd34rxBSzHyRX5/BHMTYanmgA=
-github.com/dmwm/das2go v0.0.0-20200715170806-2590bfd90f67/go.mod h1:KtqhCgOzczDKMEitt0/bkbbafDok6ltTMeVx1XDnyPQ=
+github.com/dmwm/das2go v0.0.0-20200717183329-77549fa70d07 h1:31cr5ISSeh15nJwC4XZeCgH4vhCqHArDVoICXxT5CiA=
+github.com/dmwm/das2go v0.0.0-20200717183329-77549fa70d07/go.mod h1:fqWO1dDEXeYJ2xf/JeEGkU9JzjrbNtZKbYnOX8mlr7c=
 github.com/dmwm/udp-collector v0.0.0-20200417154139-a225356bc1a3/go.mod h1:6VWWNRaICq5+1XddlJIe8t1f6HVuaW3zroSmC1z1Jis=
 github.com/go-ole/go-ole v1.2.4/go.mod h1:XCwSNxSkXRo4vlyPy93sltvi/qJq0jqQhjqQNIwKuxM=
 github.com/go-stomp/stomp v2.0.6+incompatible/go.mod h1:VqCtqNZv1226A1/79yh+rMiFUcfY3R109np+7ke4n0c=
@@ -30,7 +30,6 @@ github.com/prometheus/procfs v0.1.3/go.mod h1:lV6e/gmhEcM9IjHGsFOCxxuZ+z1YqCvr4O
 github.com/shirou/gopsutil v2.19.9+incompatible/go.mod h1:5b4v6he4MtMOwMlS0TUMTu2PcXUg8+E1lC7eC3UO/RA=
 github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4/go.mod h1:qsXQc7+bwAM3Q1u/4XEfrquwF8Lw7D7y5cD8CuHnfIc=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
-github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=

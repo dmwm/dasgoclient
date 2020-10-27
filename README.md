@@ -48,8 +48,8 @@ Examples:
         dasgoclient -query="dataset=/ZMM*/*/*"
         # get results in JSON data-format
         dasgoclient -query="dataset=/ZMM*/*/*" -json
-        # get results from specific CMS data-service, e.g. phedex
-        dasgoclient -query="file dataset=/ZMM/Summer11-DESIGN42_V11_428_SLHC1-v1/GEN-SIM system=phedex" -json
+        # get results from specific CMS data-service, e.g. rucio 
+        dasgoclient -query="file dataset=/ZMM/Summer11-DESIGN42_V11_428_SLHC1-v1/GEN-SIM system=rucio" -json
 ```
 
 ### DAS queries example
