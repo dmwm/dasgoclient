@@ -616,7 +616,9 @@ func getFilteredRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord, s
 				} else {
 					val, _, _, err := jsonparser.Get(rbytes, filters...)
 					if err != nil {
-						fmt.Printf("Unable to extract filters=%v, error=%v\n", filters, err)
+						if utils.VERBOSE > 0 {
+							fmt.Printf("Unable to extract filters=%v, error=%v\n", filters, err)
+						}
 					} else {
 						out = append(out, string(val))
 					}
