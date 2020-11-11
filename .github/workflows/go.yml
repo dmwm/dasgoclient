@@ -31,7 +31,12 @@ jobs:
         go get github.com/stretchr/testify
 
     - name: Build
-      run: make build_all
+      run: |
+        GOOS=darwin go build -ldflags="-s -w -extldflags -static"
+        GOOS=linux go build -ldflags="-s -w -extldflags -static"
+        GOOS=ppc64le go build -ldflags="-s -w -extldflags -static"
+        GOOS=arm64 go build -ldflags="-s -w -extldflags -static"
+        GOOS=amd64 go build -ldflags="-s -w -extldflags -static"
 
     - name: Test
       run: go test -v .
