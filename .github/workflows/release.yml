@@ -1,8 +1,6 @@
 name: Release
 
 on:
-  release:
-    types: [created]
   push:
     tags:
       - '*.*.*'
@@ -44,4 +42,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         releaseId: ${{ needs.create_release.outputs.id }}
-        args: 'dasgoclient_*'
+        args: 'dasgoclient*'
