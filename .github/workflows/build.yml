@@ -37,11 +37,6 @@ jobs:
     - name: Build
       run: |
         make build_all
-#         GOARCH=amd64 GOOS=windows go build -ldflags="-s -w -extldflags -static" -o dasgoclient.exe
-#         GOOS=darwin go build -ldflags="-s -w -extldflags -static" -o dasgoclient_osx
-#         GOARCH=ppc64le GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_ppc
-#         GOARCH=arm64 GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_arm
-#         GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_linux
 
     - name: Create Release
       id: create_release
@@ -76,26 +71,26 @@ jobs:
         asset_name: dasgoclient.exe
         asset_content_type: application/octet-stream
 
-    - name: Upload PPC binary
-      id: upload-dasgoclient_ppc
+    - name: Upload Power8 binary
+      id: upload-dasgoclient_power8
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dasgoclient_ppc
-        asset_name: dasgoclient_ppc
+        asset_path: ./dasgoclient_power8
+        asset_name: dasgoclient_power8
         asset_content_type: application/octet-stream
 
-    - name: Upload ARM binary
-      id: upload-dasgoclient_arm
+    - name: Upload ARM64 binary
+      id: upload-dasgoclient_arm64
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dasgoclient_arm
-        asset_name: dasgoclient_arm
+        asset_path: ./dasgoclient_arm64
+        asset_name: dasgoclient_arm64
         asset_content_type: application/octet-stream
 
     - name: Upload OSX/macOS binary
