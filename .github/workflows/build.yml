@@ -54,7 +54,7 @@ jobs:
         prerelease: false
 
     - name: Upload linux binary
-      id: upload-release-asset 
+      id: upload-dasgoclient_linux
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,4 +62,48 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./dasgoclient_linux
         asset_name: dasgoclient_linux
+        asset_content_type: application/octet-stream
+
+    - name: Upload windows binary
+      id: upload-dasgoclient_windows
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dasgoclient.exe
+        asset_name: dasgoclient.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload PPC binary
+      id: upload-dasgoclient_ppc
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dasgoclient_ppc
+        asset_name: dasgoclient_ppc
+        asset_content_type: application/octet-stream
+
+    - name: Upload ARM binary
+      id: upload-dasgoclient_arm
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dasgoclient_arm
+        asset_name: dasgoclient_arm
+        asset_content_type: application/octet-stream
+
+    - name: Upload OSX/macOS binary
+      id: upload-dasgoclient_osx
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dasgoclient_osx
+        asset_name: dasgoclient_osx
         asset_content_type: application/octet-stream
