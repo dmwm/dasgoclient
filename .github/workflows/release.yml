@@ -1,9 +1,9 @@
 name: Release
 
-on: release
-# on:
-#   release:
-#     types: [created]
+# on: release
+on:
+  release:
+    types: [created]
 # on:
 #   push:
 #     tags:
