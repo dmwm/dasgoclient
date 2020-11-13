@@ -50,14 +50,14 @@ jobs:
         prerelease: false
 
     - name: Upload linux binary
-      id: upload-dasgoclient_linux
+      id: upload-dasgoclient_amd64
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dasgoclient_linux
-        asset_name: dasgoclient_linux
+        asset_path: ./dasgoclient_amd64
+        asset_name: dasgoclient_amd64
         asset_content_type: application/octet-stream
 
     - name: Upload windows binary
@@ -72,25 +72,25 @@ jobs:
         asset_content_type: application/octet-stream
 
     - name: Upload Power8 binary
-      id: upload-dasgoclient_power8
+      id: upload-dasgoclient_ppc64le
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dasgoclient_power8
-        asset_name: dasgoclient_power8
+        asset_path: ./dasgoclient_ppc64le
+        asset_name: dasgoclient_ppc64le
         asset_content_type: application/octet-stream
 
     - name: Upload ARM64 binary
-      id: upload-dasgoclient_arm64
+      id: upload-dasgoclient_aarch64
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dasgoclient_arm64
-        asset_name: dasgoclient_arm64
+        asset_path: ./dasgoclient_aarch64
+        asset_name: dasgoclient_aarch64
         asset_content_type: application/octet-stream
 
     - name: Upload OSX/macOS binary
