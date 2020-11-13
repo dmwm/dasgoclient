@@ -1,10 +1,14 @@
 name: Build
 
+# on:
+#   push:
+#     branches: [ master ]
+#   pull_request:
+#     branches: [ master ]
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - '*.*.*'
 
 jobs:
 
@@ -37,3 +41,15 @@ jobs:
         GOARCH=ppc64le GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_ppc
         GOARCH=arm64 GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_arm
         GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_linux
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+

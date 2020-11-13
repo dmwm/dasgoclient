@@ -1,13 +1,13 @@
 name: Release
 
-# on: release
+on: release
 # on:
 #   release:
 #     types: [created]
-on:
-  push:
-    tags:
-      - '*.*.*'
+# on:
+#   push:
+#     tags:
+#       - '*.*.*'
 
 jobs:
 
@@ -40,17 +40,6 @@ jobs:
         GOARCH=ppc64le GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_ppc
         GOARCH=arm64 GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_arm
         GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_linux
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
 
     - name: Upload linux binaries
       uses: skx/github-action-publish-binaries@master
