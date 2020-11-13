@@ -1,11 +1,12 @@
 name: Release
 
-on:
-  release:
-    types: [created]
-  push:
-    tags:
-      - '*.*.*'
+on: release
+# on:
+#   release:
+#     types: [created]
+#   push:
+#     tags:
+#       - '*.*.*'
 
 jobs:
 
@@ -38,9 +39,10 @@ jobs:
         GOARCH=ppc64le GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_ppc
         GOARCH=arm64 GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_arm
         GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_linux
-    - name: Upload binaries
-      uses: skx/github-action-publish-binaries@master
+
+    - name: Upload linux binaries
+      uses: JasonEtco/upload-to-release@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        args: 'dasgoclient*'
+        args: dasgoclient_linux application/octet-stream
