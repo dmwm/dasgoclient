@@ -36,11 +36,12 @@ jobs:
 
     - name: Build
       run: |
-        GOARCH=amd64 GOOS=windows go build -ldflags="-s -w -extldflags -static" -o dasgoclient.exe
-        GOOS=darwin go build -ldflags="-s -w -extldflags -static" -o dasgoclient_osx
-        GOARCH=ppc64le GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_ppc
-        GOARCH=arm64 GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_arm
-        GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_linux
+        make build_all
+#         GOARCH=amd64 GOOS=windows go build -ldflags="-s -w -extldflags -static" -o dasgoclient.exe
+#         GOOS=darwin go build -ldflags="-s -w -extldflags -static" -o dasgoclient_osx
+#         GOARCH=ppc64le GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_ppc
+#         GOARCH=arm64 GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_arm
+#         GOOS=linux go build -ldflags="-s -w -extldflags -static" -o dasgoclient_linux
 
     - name: Create Release
       id: create_release
