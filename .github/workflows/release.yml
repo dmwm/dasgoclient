@@ -4,6 +4,7 @@ name: Release
 # on:
 #   release:
 #     types: [created]
+on:
   push:
     tags:
       - '*.*.*'
