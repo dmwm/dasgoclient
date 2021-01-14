@@ -249,7 +249,7 @@ func DASKeyMap() map[string][]string {
 		"site":    []string{"dbs", "combined", "rucio"},
 		"dataset": []string{"dbs3"},
 		"block":   []string{"dbs3"},
-		"file":    []string{"dbs3"},
+		"file":    []string{"dbs3", "rucio"},
 		"run":     []string{"runregistry", "dbs3"},
 		"config":  []string{"reqmgr2"},
 	}
