@@ -23,7 +23,7 @@ git push -u origin IB/CMSSW_11_3_X/master
 git checkout IB/CMSSW_11_3_X/master
 git fetch upstream; git rebase upstream/IB/CMSSW_11_3_X/master
 git push
-git checkout -b dasgoclient-v02.04.25
+git checkout -b dasgoclient-v02.04.26
 git branch -l
 
 # change specs
@@ -35,12 +35,12 @@ cd .. # cd ~/workspace/builds
 ./build.sh dasgoclient-binary
 
 # locate RPM
-ls -al w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.25-1-1.slc7_amd64_gcc820.rpm
+ls -al w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.26-1-1.slc7_amd64_gcc820.rpm
 
 # copy RPM to EOS area
-cp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.25-1-1.slc7_amd64_gcc820.rpm /eos/user/v/valya/www/dasgoclient/
+cp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.26-1-1.slc7_amd64_gcc820.rpm /eos/user/v/valya/www/dasgoclient/
 # copy RPM on vocms0181
-scp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.25-1-1.slc7_amd64_gcc820.rpm valya@lxplus.cern.ch:/eos/user/v/valya/www/dasgoclient/
+scp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.26-1-1.slc7_amd64_gcc820.rpm valya@lxplus.cern.ch:/eos/user/v/valya/www/dasgoclient/
 
 ### END OF OBSOLETE
 
@@ -48,8 +48,8 @@ scp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.25-1-1.slc7_amd64_
 ./build.sh dasgoclient
 
 # test new client
-###cp w820/slc7_amd64_gcc820/cms/dasgoclient-binary/v02.04.25/bin/dasgoclient_linux ./dasgoclient
-cp w820/slc7_amd64_gcc820/cms/dasgoclient/v02.04.25/bin/dasgoclient .
+###cp w820/slc7_amd64_gcc820/cms/dasgoclient-binary/v02.04.26/bin/dasgoclient_linux ./dasgoclient
+cp w820/slc7_amd64_gcc820/cms/dasgoclient/v02.04.26/bin/dasgoclient .
 voms-proxy-init -voms cms -rfc
 ./dasgoclient -help
 
@@ -58,11 +58,11 @@ cd cmsdist
 git commit -m "New dasgoclient version" dasgoclient*.spec
 
 # push changes
-git push -u origin dasgoclient-v02.04.25
+git push -u origin dasgoclient-v02.04.26
 
 # finally make pull request
 
 # delete local branch (named newfeature)
-git branch -d dasgoclient-v02.04.25
+git branch -d dasgoclient-v02.04.26
 # delete remote branch (named newfeature)
-git push origin :dasgoclient-v02.04.25
+git push origin :dasgoclient-v02.04.26
