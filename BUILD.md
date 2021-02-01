@@ -5,7 +5,6 @@ rm go.mod go.sum && go mod init && go mod tidy
 cd workspace/builds
 # login on vocms0181
 cd /wma/vk/das_builds
-export SCRAM_ARCH=slc7_amd64_gcc700
 export SCRAM_ARCH=slc7_amd64_gcc820
 cd cmsdist
 # either create new git branch
@@ -29,26 +28,10 @@ git branch -l
 # change specs
 vim dasgoclient*.spec
 
-### OBSOLETE WITH MIGRATION TO GITHUB ACTION
-# build RPMS
-cd .. # cd ~/workspace/builds
-./build.sh dasgoclient-binary
-
-# locate RPM
-ls -al w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.26-1-1.slc7_amd64_gcc820.rpm
-
-# copy RPM to EOS area
-cp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.26-1-1.slc7_amd64_gcc820.rpm /eos/user/v/valya/www/dasgoclient/
-# copy RPM on vocms0181
-scp w820/RPMS/slc7_amd64_gcc820/cms+dasgoclient-binary+v02.04.26-1-1.slc7_amd64_gcc820.rpm valya@lxplus.cern.ch:/eos/user/v/valya/www/dasgoclient/
-
-### END OF OBSOLETE
-
 # now we can build dasgoclient wrapper since it look-up dasgoclient RPMs
 ./build.sh dasgoclient
 
 # test new client
-###cp w820/slc7_amd64_gcc820/cms/dasgoclient-binary/v02.04.26/bin/dasgoclient_linux ./dasgoclient
 cp w820/slc7_amd64_gcc820/cms/dasgoclient/v02.04.26/bin/dasgoclient .
 voms-proxy-init -voms cms -rfc
 ./dasgoclient -help
