@@ -855,6 +855,7 @@ func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.D
 	//     defer utils.ErrPropagate("processUrls")
 
 	var dasrecords []mongo.DASRecord
+	client := utils.HttpClient()
 	if len(urls) == 1 {
 		for furl, args := range urls {
 			if dasquery.Detail && strings.Contains(furl, "detail=False") {
@@ -863,7 +864,7 @@ func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.D
 			//             if !dasquery.Detail && strings.Contains(furl, "detail=True") {
 			//                 furl = strings.Replace(furl, "detail=True", "detail=False", -1)
 			//             }
-			resp := utils.FetchResponse(furl, args)
+			resp := utils.FetchResponse(client, furl, args)
 			return response2Records(&resp, dasquery, maps, dmaps, pkeys)
 		}
 	}
@@ -878,7 +879,7 @@ func processURLs(dasquery dasql.DASQuery, urls map[string]string, maps []mongo.D
 		//             furl = strings.Replace(furl, "detail=True", "detail=False", -1)
 		//         }
 		umap[furl] = 1 // keep track of processed urls below
-		go utils.Fetch(furl, args, out)
+		go utils.Fetch(client, furl, args, out)
 	}
 
 	// collect all results from out channel
