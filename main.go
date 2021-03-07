@@ -64,6 +64,8 @@ func main() {
 	flag.IntVar(&timeout, "timeout", 0, "Timeout for url call")
 	var urlRetry int
 	flag.IntVar(&urlRetry, "urlRetry", 3, "urlRetry for url call")
+	var urlQueuelimit int
+	flag.IntVar(&urlQueuelimit, "urlQueuelimit", 100, "url queue limit (number of concurrent calls)")
 	var funcProfile string
 	flag.StringVar(&funcProfile, "funcProfile", "", "Specify location of function profile file")
 	flag.Usage = func() {
@@ -91,7 +93,7 @@ func main() {
 	}
 	utils.DASMAPS = dasmaps
 	utils.VERBOSE = verbose
-	utils.UrlQueueLimit = 1000
+	utils.UrlQueueLimit = int32(urlQueuelimit)
 	utils.UrlRetry = urlRetry
 	utils.WEBSERVER = 0
 	utils.TIMEOUT = timeout
@@ -121,8 +123,14 @@ func main() {
 			// for filters and aggregators we need to use detail=true flag
 			query = strings.Replace(query, "|", " detail=true |", 1)
 		}
+		if utils.UrlQueueLimit > 0 {
+			// initialize das2go utils which will spawn goroutine for
+			// queueing the HTTP calls
+			utils.Init()
+		}
 		process(query, jsonout, sep, unique, format, host, idx, limit, aggregate)
 	}
+	os.Exit(0)
 }
 
 // helper function to check DAS records and return first error code, otherwise 0
@@ -387,12 +395,23 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	}
 	// loop over services and select which one(s) we'll use
 	var selectedServices []string
+	var rucioQuery bool
 	for _, dmap := range maps {
 		system, _ := dmap["system"].(string)
+		if system == "combined" || system == "rucio" {
+			rucioQuery = true
+		}
 		if skipSystem(dasquery, system) && len(mapServices) > 1 {
 			continue
 		}
 		selectedServices = append(selectedServices, system)
+	}
+	// if we have rucio query obtain token first
+	if rucioQuery {
+		token, terr := utils.RucioAuth.Token()
+		if utils.VERBOSE > 0 {
+			fmt.Println("rucio token", token, terr)
+		}
 	}
 	// if nothing is selected use original from the map
 	if len(selectedServices) == 0 || aggregate {
