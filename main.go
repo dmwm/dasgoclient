@@ -101,6 +101,14 @@ func main() {
 	utils.TIMEOUT = timeout
 	utils.CLIENT_VERSION = "{{VERSION}}"
 	utils.TLSCertsRenewInterval = 600 * time.Second
+	if token == "" {
+		// check the BEARER_TOKEN or BEARER_TOKEN_FILE env
+		if os.Getenv("BEARER_TOKEN") != "" {
+			token = os.Getenv("BEARER_TOKEN")
+		} else if os.Getenv("BEARER_TOKEN_FILE") != "" {
+			token = os.Getenv("BEARER_TOKEN_FILE")
+		}
+	}
 	utils.Token = token
 	if funcProfile != "" {
 		utils.InitFunctionProfiler(funcProfile)
