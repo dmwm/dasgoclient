@@ -22,7 +22,7 @@ git push -u origin IB/CMSSW_11_3_X/master
 git checkout IB/CMSSW_11_3_X/master
 git fetch upstream; git rebase upstream/IB/CMSSW_11_3_X/master
 git push
-git checkout -b dasgoclient-v02.04.28
+git checkout -b dasgoclient-v02.04.29
 git branch -l
 
 # change specs
@@ -32,7 +32,7 @@ vim dasgoclient*.spec
 ./build.sh dasgoclient
 
 # test new client
-cp w820/slc7_amd64_gcc820/cms/dasgoclient/v02.04.28/bin/dasgoclient .
+cp w820/slc7_amd64_gcc820/cms/dasgoclient/v02.04.29/bin/dasgoclient .
 voms-proxy-init -voms cms -rfc
 ./dasgoclient -help
 
@@ -41,11 +41,11 @@ cd cmsdist
 git commit -m "New dasgoclient version" dasgoclient*.spec
 
 # push changes
-git push -u origin dasgoclient-v02.04.28
+git push -u origin dasgoclient-v02.04.29
 
 # finally make pull request
 
 # delete local branch (named newfeature)
-git branch -d dasgoclient-v02.04.28
+git branch -d dasgoclient-v02.04.29
 # delete remote branch (named newfeature)
-git push origin :dasgoclient-v02.04.28
+git push origin :dasgoclient-v02.04.29
