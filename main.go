@@ -48,6 +48,8 @@ func main() {
 	flag.StringVar(&dasmaps, "dasmaps", "", "Specify location of dasmaps")
 	var aggregate bool
 	flag.BoolVar(&aggregate, "aggregate", false, "aggregate results across all data-services")
+	var token string
+	flag.StringVar(&token, "token", "", "Specify location of token file")
 	var verbose int
 	flag.IntVar(&verbose, "verbose", 0, "Verbose level, support 0,1,2")
 	var examples bool
@@ -99,6 +101,7 @@ func main() {
 	utils.TIMEOUT = timeout
 	utils.CLIENT_VERSION = "{{VERSION}}"
 	utils.TLSCertsRenewInterval = 600 * time.Second
+	utils.Token = token
 	if funcProfile != "" {
 		utils.InitFunctionProfiler(funcProfile)
 	}
