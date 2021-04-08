@@ -218,6 +218,9 @@ func info() string {
 
 // helper function to check X509 settings
 func checkX509() {
+	if utils.Token != "" {
+		return
+	}
 	uproxy := os.Getenv("X509_USER_PROXY")
 	uckey := os.Getenv("X509_USER_KEY")
 	ucert := os.Getenv("X509_USER_CERT")
