@@ -4,8 +4,8 @@ github.com/buger/jsonparser v1.1.1/go.mod h1:6RYKKt7H4d4+iWqouImQ9R2FZql3VbhNgx2
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dmwm/cmsauth v0.0.0-20200227183320-1e78c9119730/go.mod h1:Bi7pLBRdNIRdhUbSFT3jZvEM2zTSTat/IuHiJMctqIQ=
-github.com/dmwm/das2go v0.0.0-20210407122922-21731d5e9125 h1:EsMQ5Tln6A9R3xmr35OlysmSNh12YvfW/wT8lAbxjXY=
-github.com/dmwm/das2go v0.0.0-20210407122922-21731d5e9125/go.mod h1:SGYLtX4zvNLut/qYvEAhGnhbk82qS0TXqY0TdeRK9kA=
+github.com/dmwm/das2go v0.0.0-20210407185753-2b473a34c749 h1:1E4PNGHaJ+eGk2lrB6YrelcqVMJOCOb4fV2fGFZkFv4=
+github.com/dmwm/das2go v0.0.0-20210407185753-2b473a34c749/go.mod h1:SGYLtX4zvNLut/qYvEAhGnhbk82qS0TXqY0TdeRK9kA=
 github.com/go-ole/go-ole v1.2.5/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
 github.com/go-stomp/stomp v2.0.5+incompatible/go.mod h1:VqCtqNZv1226A1/79yh+rMiFUcfY3R109np+7ke4n0c=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
