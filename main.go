@@ -278,7 +278,7 @@ func DASKeyMap() map[string][]string {
 	return keyMap
 }
 
-// helper function to extracvt services from DAS map
+// helper function to extract services from DAS map
 func dasServices(rec mongo.DASRecord) []string {
 	var out []string
 	switch s := rec["services"].(type) {
@@ -435,9 +435,27 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 	// if we're not aggregating results
 	// use only primary data-service for all requests except site queries
 	if !aggregate {
-		if len(dasquery.Fields) == 1 && dasquery.Fields[0] != "site" {
+		if len(dasquery.Fields) == 1 && dasquery.Fields[0] != "site" && len(selectedServices) > 0 {
 			selectedServices = []string{selectedServices[0]}
 		}
+	}
+
+	// return proper message if no selected services are found
+	if len(selectedServices) == 0 {
+		if jsonout {
+			fmt.Println("[")
+			msg := "no APIs found to answer your query"
+			rec := mongo.DASErrorRecord(msg, utils.DASQueryErrorName, utils.DASQueryError)
+			data, err := json.Marshal(rec)
+			if err == nil {
+				fmt.Println(string(data))
+			} else {
+				fmt.Printf("{\"status\":\"error\", \"error\":\"no APIs found to answer your query\"}")
+			}
+			fmt.Println("]")
+		}
+		os.Exit(utils.DASQueryError)
+
 	}
 
 	// get list of services, pkeys, urls and localApis we need to process
