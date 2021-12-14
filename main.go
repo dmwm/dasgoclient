@@ -99,6 +99,7 @@ func main() {
 	utils.UrlRetry = urlRetry
 	utils.WEBSERVER = 0
 	utils.TIMEOUT = timeout
+	services.FrontendURL = host
 	utils.CLIENT_VERSION = "{{VERSION}}"
 	utils.TLSCertsRenewInterval = 600 * time.Second
 	if token == "" {
