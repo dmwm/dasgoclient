@@ -116,7 +116,7 @@ func main() {
 	}
 	checkX509()
 	if verbose > 0 {
-		fmt.Println("DBSUrl: ", services.DBSUrl("prod"))
+		fmt.Println("DBSUrl: ", services.DBSUrl("prod/global"))
 		fmt.Println("SitedbUrl: ", services.SitedbUrl())
 		fmt.Println("CricUrl w/ site API: ", services.CricUrl("site"))
 		fmt.Println("RucioUrl: ", services.RucioUrl())
