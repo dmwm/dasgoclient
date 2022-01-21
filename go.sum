@@ -5,10 +5,10 @@ github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ3
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dmwm/cmsauth v0.0.0-20210902172554-166499e72579/go.mod h1:TC1wDcaqoLxdESgkWahbggwrhuqLBEn9TnOyfVjGeOE=
-github.com/dmwm/das2go v0.0.0-20211213184327-2871579d81d4 h1:SZMBXs/hJIfGI7YJpRNRnpXgS3b3D9MdTymjonA7Huk=
-github.com/dmwm/das2go v0.0.0-20211213184327-2871579d81d4/go.mod h1:G1K2zEk0mZpSER5bxqAwTZsl/G9RxYr+3OXqoVmiZNM=
-github.com/dmwm/das2go v0.0.0-20211217121238-a2bf102e509e h1:eFgAQ5A2LRgn9OYpYnN+472oyAr4LTCfLbIsZ86BtvU=
-github.com/dmwm/das2go v0.0.0-20211217121238-a2bf102e509e/go.mod h1:G1K2zEk0mZpSER5bxqAwTZsl/G9RxYr+3OXqoVmiZNM=
+github.com/dmwm/das2go v0.0.0-20220121172503-743545e96ddb h1:A5o1lCJlZs3D+tkowLuML2spT2VcrN81eW9iY66vt/A=
+github.com/dmwm/das2go v0.0.0-20220121172503-743545e96ddb/go.mod h1:G1K2zEk0mZpSER5bxqAwTZsl/G9RxYr+3OXqoVmiZNM=
+github.com/dmwm/das2go v0.0.0-20220121173233-cba4d3ebdd14 h1:SaeBRzqXkg6gN5stI4El54E3MGmw4LQdDNgfCcsmNFw=
+github.com/dmwm/das2go v0.0.0-20220121173233-cba4d3ebdd14/go.mod h1:G1K2zEk0mZpSER5bxqAwTZsl/G9RxYr+3OXqoVmiZNM=
 github.com/go-ole/go-ole v1.2.5/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
 github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
@@ -26,8 +26,6 @@ github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible/go.mod h1:ZQnN8lSECae
 github.com/lestrrat-go/strftime v1.0.5/go.mod h1:E1nN3pCbtMSu1yjSVeyuRFVm/U0xoR76fd03sz+Qz4g=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
-github.com/pkg/profile v1.5.0 h1:042Buzk+NhDI+DeSAA62RwJL8VAuZUMQZUjCsRz1Mug=
-github.com/pkg/profile v1.5.0/go.mod h1:qBsxPvzyUincmltOk6iyRVxHYg4adc0OFOv72ZdLa18=
 github.com/pkg/profile v1.6.0 h1:hUDfIISABYI59DyeB3OTay/HxSRwTQ8rB/H83k6r5dM=
 github.com/pkg/profile v1.6.0/go.mod h1:qBsxPvzyUincmltOk6iyRVxHYg4adc0OFOv72ZdLa18=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
