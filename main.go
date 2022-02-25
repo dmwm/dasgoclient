@@ -359,7 +359,14 @@ func skipSystem(dasquery dasql.DASQuery, system string) bool {
 }
 
 // Process function process' given query and return back results
-func process(query string, jsonout bool, sep string, unique bool, format, host string, rdx, limit int, aggregate bool) {
+func process(
+	query string,
+	jsonout bool,
+	sep string,
+	unique bool,
+	format, host string,
+	rdx, limit int,
+	aggregate bool) {
 
 	// defer function profiler
 	defer utils.MeasureTime("dasgoclient/process")
@@ -538,6 +545,13 @@ func process(query string, jsonout bool, sep string, unique bool, format, host s
 			}
 		}
 		dasrecords = out
+	}
+
+	if utils.InList("file", dasquery.Fields) && utils.InList("lumi", dasquery.Fields) {
+		dasrecords = aggregateFileLumis(dasrecords)
+	}
+	if utils.InList("run", dasquery.Fields) {
+		dasrecords = aggregateRuns(dasrecords)
 	}
 
 	// if user provides format option we'll add extra fields to be compatible with das_client
