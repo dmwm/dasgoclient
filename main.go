@@ -62,6 +62,8 @@ func main() {
 	flag.BoolVar(&exitCodes, "exitCodes", false, "Show DAS error codes")
 	var unique bool
 	flag.BoolVar(&unique, "unique", false, "Sort results and return unique list")
+	var noDbsAgg bool
+	flag.BoolVar(&noDbsAgg, "noDbsAgg", false, "do not perform DBS aggregation")
 	var timeout int
 	flag.IntVar(&timeout, "timeout", 0, "Timeout for url call")
 	var urlRetry int
@@ -140,7 +142,7 @@ func main() {
 			// queueing the HTTP calls
 			utils.Init()
 		}
-		process(query, jsonout, sep, unique, format, host, idx, limit, aggregate)
+		process(query, jsonout, sep, unique, format, host, idx, limit, aggregate, noDbsAgg)
 	}
 	os.Exit(0)
 }
@@ -366,7 +368,8 @@ func process(
 	unique bool,
 	format, host string,
 	rdx, limit int,
-	aggregate bool) {
+	aggregate bool,
+	noDbsAgg bool) {
 
 	// defer function profiler
 	defer utils.MeasureTime("dasgoclient/process")
@@ -547,11 +550,15 @@ func process(
 		dasrecords = out
 	}
 
-	if utils.InList("file", dasquery.Fields) && utils.InList("lumi", dasquery.Fields) {
-		dasrecords = aggregateFileLumis(dasrecords)
-	}
-	if utils.InList("run", dasquery.Fields) {
-		dasrecords = aggregateRuns(dasrecords)
+	// aggregate or not DBS results (new DBS Go server return results in
+	// no aggregated form while DBS Python server provides results aggregation)
+	if !noDbsAgg {
+		if utils.InList("file", dasquery.Fields) && utils.InList("lumi", dasquery.Fields) {
+			dasrecords = aggregateFileLumis(dasrecords)
+		}
+		if utils.InList("run", dasquery.Fields) {
+			dasrecords = aggregateRuns(dasrecords)
+		}
 	}
 
 	// if user provides format option we'll add extra fields to be compatible with das_client
