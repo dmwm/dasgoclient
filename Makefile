@@ -15,13 +15,19 @@ build:
 	go clean; rm -rf pkg dasgoclient*; go build ${flags}
 	sed -i -e "s,$(TAG),{{VERSION}},g" main.go
 
-build_all: build_osx build_linux build_power8 build_arm64 build_windows
+build_all: build_osx build_osx_arm64 build_linux build_power8 build_arm64 build_windows
 
 build_osx:
 	sed -i -e "s,{{VERSION}},$(TAG),g" main.go
-	go clean; rm -rf pkg dasgoclient_osx; GOOS=darwin go build ${flags}
+	go clean; rm -rf pkg dasgoclient_osx; GOARCH=amd64 GOOS=darwin go build ${flags}
 	sed -i -e "s,$(TAG),{{VERSION}},g" main.go
 	mv dasgoclient dasgoclient_osx
+
+build_osx_arm64:
+	sed -i -e "s,{{VERSION}},$(TAG),g" main.go
+	go clean; rm -rf pkg dasgoclient_osx_aarch64; GOARCH=arm64 GOOS=darwin go build ${flags}
+	sed -i -e "s,$(TAG),{{VERSION}},g" main.go
+	mv dasgoclient dasgoclient_osx_aarch64
 
 build_linux:
 	sed -i -e "s,{{VERSION}},$(TAG),g" main.go

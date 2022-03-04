@@ -103,3 +103,14 @@ jobs:
         asset_path: ./dasgoclient_osx
         asset_name: dasgoclient_osx
         asset_content_type: application/octet-stream
+
+    - name: Upload OSX/macOS ARM64 binary
+      id: upload-dasgoclient_osx_aarch64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dasgoclient_osx_aarch64
+        asset_name: dasgoclient_osx_aarch64
+        asset_content_type: application/octet-stream
