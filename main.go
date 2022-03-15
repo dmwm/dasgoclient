@@ -54,6 +54,10 @@ func main() {
 	flag.IntVar(&verbose, "verbose", 0, "Verbose level, support 0,1,2")
 	var examples bool
 	flag.BoolVar(&examples, "examples", false, "Show examples of supported DAS queries")
+	var dnsCache bool
+	flag.BoolVar(&dnsCache, "dnsCache", false, "use local DNS cache")
+	var noKeepAlive bool
+	flag.BoolVar(&noKeepAlive, "noKeepAlive", false, "do not use keep-alive HTTP header")
 	var version bool
 	flag.BoolVar(&version, "version", false, "Show version")
 	var daskeys bool
@@ -101,6 +105,12 @@ func main() {
 	utils.UrlRetry = urlRetry
 	utils.WEBSERVER = 0
 	utils.TIMEOUT = timeout
+	utils.UseDNSCache = dnsCache
+	if noKeepAlive {
+		utils.KEEP_ALIVE = false
+	} else {
+		utils.KEEP_ALIVE = true
+	}
 	services.FrontendURL = host
 	utils.CLIENT_VERSION = "{{VERSION}}"
 	utils.TLSCertsRenewInterval = 600 * time.Second
@@ -385,6 +395,12 @@ func process(
 		dmaps.ChangeUrl("prod/global", "int/global")
 	}
 	dasquery, err, posLine := dasql.Parse(query, "", dmaps.DASKeys())
+	// special case for "file dataset" query
+	// if we have not given json output and there is no DAS filters we can safely
+	// use details=false in DBS queries
+	if !jsonout && len(dasquery.Filters) == 0 {
+		dasquery.Detail = false
+	}
 	if utils.VERBOSE > 0 {
 		fmt.Println(err)
 		fmt.Println(query)
