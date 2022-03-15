@@ -31,7 +31,7 @@ build_osx_arm64:
 
 build_linux:
 	sed -i -e "s,{{VERSION}},$(TAG),g" main.go
-	go clean; rm -rf pkg dasgoclient_amd64; GOOS=linux go build ${flags}
+	go clean; rm -rf pkg dasgoclient_amd64; GOOS=linux GODEBUG=asyncpreemptoff=1 go build ${flags}
 	sed -i -e "s,$(TAG),{{VERSION}},g" main.go
 	mv dasgoclient dasgoclient_amd64
 
