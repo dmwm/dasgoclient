@@ -398,7 +398,7 @@ func process(
 	// special case for "file dataset" query
 	// if we have not given json output and there is no DAS filters we can safely
 	// use details=false in DBS queries
-	if !jsonout && len(dasquery.Filters) == 0 {
+	if !jsonout && len(dasquery.Filters) == 0 && !strings.Contains(dasquery.Query, "detail") {
 		dasquery.Detail = false
 	}
 	if utils.VERBOSE > 0 {
