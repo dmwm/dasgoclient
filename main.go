@@ -737,14 +737,27 @@ func getAggregatedRecords(dasquery dasql.DASQuery, dasrecords []mongo.DASRecord,
 				continue
 			}
 			fval := agg[1]
-			var aval string
+			var sval string
 			switch res := rec["result"].(type) {
 			case map[string]interface{}:
-				aval = fmt.Sprintf("%v", res["value"])
+				switch val := res["value"].(type) {
+				case int64:
+					sval = fmt.Sprintf("%s(%s): %d", fagg, fval, val)
+				case float64:
+					sval = fmt.Sprintf("%s(%s): %d", fagg, fval, int64(val))
+				default:
+					sval = fmt.Sprintf("%s(%s): %v", fagg, fval, val)
+				}
 			case mongo.DASRecord:
-				aval = fmt.Sprintf("%v", res["value"])
+				switch val := res["value"].(type) {
+				case int64:
+					sval = fmt.Sprintf("%s(%s): %d", fagg, fval, val)
+				case float64:
+					sval = fmt.Sprintf("%s(%s): %d", fagg, fval, int64(val))
+				default:
+					sval = fmt.Sprintf("%s(%s): %v", fagg, fval, val)
+				}
 			}
-			sval := fmt.Sprintf("%s(%s): %v", fagg, fval, aval)
 			out = append(out, sval)
 		}
 		if len(out) > 0 {
