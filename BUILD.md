@@ -13,14 +13,14 @@ cd cmsdist
 # checkout branch I need from upstream (OPTIONAL if it does no exists)
 git checkout master
 git fetch upstream; git rebase upstream/master
-git checkout -b IB/CMSSW_12_4_X/master upstream/IB/CMSSW_12_4_X/master
+git checkout -b IB/CMSSW_12_5_X/master upstream/IB/CMSSW_12_5_X/master
 # push this branch into my cmsdist (OPTIONAL depends on previous step)
-git push -u origin IB/CMSSW_12_4_X/master
+git push -u origin IB/CMSSW_12_5_X/master
 # END  OPTIONAL
 
 # if I have this branch I need to sync first
-git checkout IB/CMSSW_12_4_X/master
-git fetch upstream; git rebase upstream/IB/CMSSW_12_4_X/master
+git checkout IB/CMSSW_12_5_X/master
+git fetch upstream; git rebase upstream/IB/CMSSW_12_5_X/master
 git push
 git checkout -b dasgoclient-v02.04.49
 git branch -l
