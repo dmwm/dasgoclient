@@ -13,16 +13,16 @@ cd cmsdist
 # checkout branch I need from upstream (OPTIONAL if it does no exists)
 git checkout master
 git fetch upstream; git rebase upstream/master
-git checkout -b IB/CMSSW_12_5_X/master upstream/IB/CMSSW_12_5_X/master
+git checkout -b IB/CMSSW_14_0_X/master upstream/IB/CMSSW_14_0_X/master
 # push this branch into my cmsdist (OPTIONAL depends on previous step)
-git push -u origin IB/CMSSW_12_5_X/master
+git push -u origin IB/CMSSW_14_0_X/master
 # END  OPTIONAL
 
 # if I have this branch I need to sync first
-git checkout IB/CMSSW_12_5_X/master
-git fetch upstream; git rebase upstream/IB/CMSSW_12_5_X/master
+git checkout IB/CMSSW_14_0_X/master
+git fetch upstream; git rebase upstream/IB/CMSSW_14_0_X/master
 git push
-git checkout -b dasgoclient-v02.04.49
+git checkout -b dasgoclient-v02.04.50
 git branch -l
 
 # change specs
@@ -32,7 +32,7 @@ vim dasgoclient*.spec
 ./build.sh dasgoclient
 
 # test new client
-cp w820/slc7_amd64_gcc820/cms/dasgoclient/v02.04.49*/bin/dasgoclient .
+cp w820/slc7_amd64_gcc820/cms/dasgoclient/v02.04.50*/bin/dasgoclient .
 voms-proxy-init -voms cms -rfc
 ./dasgoclient -help
 
@@ -41,11 +41,11 @@ cd cmsdist
 git commit -m "New dasgoclient version" dasgoclient*.spec
 
 # push changes
-git push -u origin dasgoclient-v02.04.49
+git push -u origin dasgoclient-v02.04.50
 
 # finally make pull request
 
 # delete local branch (named newfeature)
-git branch -d dasgoclient-v02.04.49
+git branch -d dasgoclient-v02.04.50
 # delete remote branch (named newfeature)
-git push origin :dasgoclient-v02.04.49
+git push origin :dasgoclient-v02.04.50
