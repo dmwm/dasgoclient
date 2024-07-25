@@ -15,7 +15,7 @@ build:
 	go clean; rm -rf pkg dasgoclient*; CGO_ENABLED=0 go build ${flags}
 	sed -i -e "s,$(TAG),{{VERSION}},g" main.go
 
-build_all: build_osx build_osx_arm64 build_linux build_power8 build_arm64 build_windows
+build_all: build_osx build_osx_arm64 build_linux build_power8 build_arm64 build_riscv64 build_windows
 
 build_osx:
 	sed -i -e "s,{{VERSION}},$(TAG),g" main.go
@@ -46,6 +46,12 @@ build_arm64:
 	go clean; rm -rf pkg dasgoclient_aarch64; GOARCH=arm64 GOOS=linux CGO_ENABLED=0 go build ${flags}
 	sed -i -e "s,$(TAG),{{VERSION}},g" main.go
 	mv dasgoclient dasgoclient_aarch64
+
+build_riscv64:
+	sed -i -e "s,{{VERSION}},$(TAG),g" main.go
+	go clean; rm -rf pkg dasgoclient_riscv64; GOARCH=riscv64 GOOS=linux CGO_ENABLED=0 go build ${flags}
+	sed -i -e "s,$(TAG),{{VERSION}},g" main.go
+	mv dasgoclient dasgoclient_riscv64
 
 build_windows:
 	go clean; rm -rf pkg dasgoclient.exe; GOARCH=amd64 GOOS=windows CGO_ENABLED=0 go build ${flags}
