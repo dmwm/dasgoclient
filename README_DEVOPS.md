@@ -238,6 +238,14 @@ For example:
 label=CMSSW_20_1_X
 ```
 
+You might want to coordinate with the release schedule announced at: https://twiki.cern.ch/twiki/bin/view/CMS/ReleaseSchedule
+Sometimes the nearest pre-release date might not mandatory belong to the latest CMSSW version (the one with the biggest version number) .e.g.:
+
+*  CMSSW_17_0_0_pre5: 25/8/2026 - https://twiki.cern.ch/twiki/bin/view/CMS/CMSSW_17_0_0
+will be released before
+* CMSSW_20_1_0_pre4: 29/9/2026  - https://twiki.cern.ch/twiki/bin/viewauth/CMS/CMSSW_20_1_0
+
+
 Then verify that the corresponding `cmsdist` IB branch exists:
 
 ```bash
