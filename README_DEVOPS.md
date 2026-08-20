@@ -216,6 +216,14 @@ Use both:
   https://twiki.cern.ch/twiki/bin/view/CMS/ReleaseSchedule
 
 The schedule matters because different CMSSW series may have pre-releases planned at different dates.
+Sometimes the nearest pre-release date might not mandatory belong to the newest CMSSW version
+(the one with the biggest version number), e.g.:
+
+
+*  CMSSW_17_0_0_pre5: 25/8/2026 - https://twiki.cern.ch/twiki/bin/view/CMS/CMSSW_17_0_0
+will be released before
+* CMSSW_20_1_0_pre4: 29/9/2026  - https://twiki.cern.ch/twiki/bin/viewauth/CMS/CMSSW_20_1_0
+
 
 ### Steps
 
