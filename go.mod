@@ -4,7 +4,7 @@ go 1.26.3
 
 require (
 	github.com/buger/jsonparser v1.2.0
-	github.com/dmwm/das2go v0.0.0-20260814135119-090a8cde94a7
+	github.com/dmwm/das2go v0.0.0-20260819141644-2301a754c6a1
 	github.com/pkg/profile v1.7.0
 	github.com/stretchr/testify v1.11.1
 )
